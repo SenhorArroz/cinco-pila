@@ -1,29 +1,208 @@
-# Create T3 App
+<a id="readme-top"></a>
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+<div align="center">
 
-## What's next? How do I make an app with this?
+<img src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png" width="120">
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+# 💸 Cinco Pila
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### Aplicação web de gestão financeira
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Aplicação web para **controle financeiro simples, rápido e acessível**.
 
-## Learn More
+Organize suas **receitas**, **despesas** e finalmente descubra  
+para onde o seu dinheiro desaparece todo mês.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+<br>
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+![NextJS](https://img.shields.io/badge/Next.js-000?style=for-the-badge&logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Node](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Tailwind](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql)
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+</div>
 
-## How do I deploy this?
+---
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+# 📊 Sobre o Projeto
+
+<img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" width="600">
+
+**Cinco Pila** é uma aplicação web criada para ajudar usuários a  
+**controlar suas finanças pessoais de forma simples e intuitiva**.
+
+A ideia nasceu de um problema universal da humanidade moderna:
+
+> “Eu tinha dinheiro ontem… o que aconteceu?”
+
+O sistema permite:
+
+- Registrar movimentações financeiras
+- Acompanhar saldo
+- Visualizar histórico de gastos
+- Organizar receitas e despesas
+
+Tudo isso em uma interface simples e direta.
+
+---
+
+# 🎯 Objetivos do Projeto
+
+- 💰 Facilitar o controle de **receitas e despesas**
+- 📈 Mostrar **de onde o dinheiro vem e para onde vai**
+- 🧠 Ajudar usuários a desenvolver **consciência financeira**
+- 🛠 Servir como projeto prático de **desenvolvimento web**
+
+---
+
+# 🧰 Tecnologias Utilizadas
+
+<div align="center">
+
+| Tecnologia | Uso |
+|------------|-----|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="30"> **TypeScript** | Tipagem segura |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="30"> **Node.js** | Backend |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="30"> **Next.js** | Framework web |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" width="30"> **Tailwind** | Estilização |
+| 🌼 **Daisy UI** | Componentes UI |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="30"> **Prisma** | ORM |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="30"> **PostgreSQL** | Banco de dados |
+| 🧹 **Biome** | Linter / Formatter |
+
+</div>
+
+---
+
+# 🚀 Começando
+
+Siga os passos abaixo para rodar o projeto localmente.
+
+---
+
+## 📦 Pré-requisitos
+
+Você precisa ter instalado:
+
+- Node.js
+- Git
+- PostgreSQL
+
+---
+
+# ⚙️ Instalação
+
+### 1️⃣ Clone o repositório
+
+```bash
+git clone https://github.com/SenhorArroz/cinco-pila
+```
+
+### 2️⃣ Entre na pasta
+
+```bash
+cd cinco-pila
+```
+
+### 3️⃣ Instale as dependências
+
+```bash
+npm install
+```
+
+### 4️⃣ Configure o arquivo `.env`
+
+```env
+DB_DATABASE=cinco_pila
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 5️⃣ Crie o banco com Prisma
+
+```bash
+npx prisma db:push
+```
+
+### 6️⃣ Inicie o projeto
+
+```bash
+npm run dev
+```
+
+A aplicação estará disponível em:
+
+```
+http://localhost:3000
+```
+
+---
+
+# 📱 Uso
+
+O **Cinco Pila** permite gerenciar sua vida financeira com recursos como:
+
+### Funcionalidades principais
+
+- 💵 Cadastro de receitas
+- 💸 Cadastro de despesas
+- 📊 Visualização de saldo total
+- 🧾 Histórico de movimentações
+- 🗂 Organização por categorias
+- 📉 Dashboard financeiro
+- 🎯 Metas e planejamento financeiro
+
+### Fluxo de uso
+
+1. Usuário registra uma **receita**
+2. Adiciona **despesas**
+3. O sistema calcula automaticamente o **saldo**
+4. O usuário acompanha seu **histórico financeiro**
+
+---
+
+# 🗺 Roadmap
+
+Funcionalidades planejadas:
+
+- [ ] Dashboard financeiro
+- [ ] Cadastro de receitas
+- [ ] Cadastro de despesas
+- [ ] Gráficos de gastos
+- [ ] Sistema de metas financeiras
+- [ ] Relatórios mensais
+- [ ] Exportação de dados
+- [ ] Controle de orçamento mensal
+
+---
+
+# 👨‍💻 Autor
+
+**Luiz**
+
+GitHub  
+https://github.com/SenhorArroz
+
+Projeto  
+https://github.com/SenhorArroz/cinco-pila
+
+---
+
+# 📚 Recursos Utilizados
+
+- Documentação do **T3 Stack**
+- TailwindCSS
+- Daisy UI
+- Prisma
+- Stack Overflow
+- Comunidade Open Source
+
+---
+
+<div align="center">
+
+### ⭐ Se o projeto te ajudou, considere dar uma estrela!
+
+</div>
