@@ -59,5 +59,19 @@ export const operacoesRouter = createTRPCRouter({
 
         return post ?? null;
     }),
+    getDaily: protectedProcedure.query(async ({ ctx }) => {
+        const post = await ctx.db.transaction.findMany({
+            orderBy: { createdAt: "desc" },
+            where: { user: { id: ctx.session.user.id }, createdAt: { gte: new Date() } },
+        });
 
+        return post ?? null;
+    }),
+    saldoAtual: protectedProcedure.query(async ({ ctx }) => {
+        const post = await ctx.db.transaction.findMany({
+            where: { user: { id: ctx.session.user.id } },
+        });
+        const saldoAtual = post?.reduce((acc, op) => acc + op.value, 0) || 0;
+        return saldoAtual;
+    }),
 });

@@ -1,143 +1,257 @@
 "use client";
 import React, { useState } from 'react';
 import FloatingNav from '../_components/FloatingNav';
+import { api } from '~/trpc/react';
 
-interface Goal {
-  id: string;
+// --- TYPES (Sincronizados com seu Router) ---
+interface GoalFormData {
+  id?: string;
   title: string;
-  current: number;
-  target: number;
-  deadline: string;
-  color: string;
+  currentAmount: number;
+  targetAmount: number;
+  deadline?: string; // Formato YYYY-MM-DD para o input
 }
 
 export default function MetasCincoPila() {
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: '1', title: 'Viagem Japão', current: 6750, target: 15000, deadline: 'Dez 2026', color: 'bg-[#e6b33d]' },
-    { id: '2', title: 'Reserva de Emergência', current: 8000, target: 10000, deadline: 'Ago 2026', color: 'bg-[#d96831]' },
-    { id: '3', title: 'MacBook Pro M3', current: 2000, target: 18000, deadline: 'Mar 2027', color: 'bg-[#995052]' },
-  ]);
   const [activeTab, setActiveTab] = useState<'home' | 'list' | 'goals' | 'limits'>('goals');
+  const utils = api.useUtils();
+
+  // --- QUERIES & MUTATIONS ---
+  const { data: goals = [], isLoading } = api.metas.getAll.useQuery();
+
+  const createGoal = api.metas.create.useMutation({
+    onSuccess: () => {
+      void utils.metas.getAll.invalidate();
+      setIsModalOpen(false);
+    },
+  });
+
+  const updateGoal = api.metas.update.useMutation({
+    onSuccess: () => {
+      void utils.metas.getAll.invalidate();
+      setIsModalOpen(false);
+    },
+  });
+
+  const deleteGoal = api.metas.delete.useMutation({
+    onSuccess: () => void utils.metas.getAll.invalidate(),
+  });
+
+  // --- ESTADOS DO MODAL ---
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<GoalFormData>({
+    title: '', currentAmount: 0, targetAmount: 0, deadline: ''
+  });
+
+  // --- HANDLERS ---
+  const handleOpenModal = (goal?: (typeof goals)[0]) => {
+    if (goal) {
+      setEditingId(goal.id);
+      setFormData({
+        title: goal.title,
+        currentAmount: goal.currentAmount,
+        targetAmount: goal.targetAmount,
+        deadline: goal.deadline ? new Date(goal.deadline).toISOString().split('T')[0] : '',
+      });
+    } else {
+      setEditingId(null);
+      setFormData({ title: '', currentAmount: 0, targetAmount: 0, deadline: '' });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      title: formData.title,
+      currentAmount: formData.currentAmount,
+      targetAmount: formData.targetAmount,
+      deadline: formData.deadline ? new Date(formData.deadline) : undefined,
+    };
+
+    if (editingId) {
+      updateGoal.mutate({ id: editingId, ...payload });
+    } else {
+      createGoal.mutate(payload);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans p-4 md:p-10 pb-32">
-      {/* --- FLOATING NAV BAR --- */}
-      <FloatingNav 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        onAddClick={() => setIsModalOpen(true)} 
-      />
-     
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
         
-        {/* HEADER COM ESTILO EDITORIAL */}
-        <header className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 border-b-4 border-[#172c3c] pb-8">
+        {/* HEADER */}
+        <header className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 border-b-8 border-[#172c3c] pb-4">
           <div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none">
-              Metas<span className="text-[#d96831]">.</span>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-none">
+              Metas<span className="text-[#d96831]">@</span>
             </h1>
-            <p className="mt-2 font-bold opacity-40 tracking-[0.3em] text-xs">Um real a mais guardado nunca é demais</p>
+            <p className="mt-2 font-bold opacity-40 tracking-[0.3em] text-xs uppercase">Conectado ao Banco de Dados</p>
           </div>
-          <button className="btn bg-[#172c3c] text-white border-none rounded-full px-10 font-black hover:scale-105 transition-transform">
+          <button 
+            onClick={() => handleOpenModal()}
+            className="btn bg-[#172c3c] text-white border-none rounded-full px-10 font-black hover:scale-105 transition-all shadow-lg"
+          >
             + CRIAR NOVO OBJETIVO
           </button>
         </header>
 
-        {/* GRID DE METAS - CARDS DIFERENTES */}
+        {/* LOADING STATE */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-[3rem]" />
+            ))}
+          </div>
+        )}
+
+        {/* GRID DE METAS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {goals.map((goal) => {
-            const percent = Math.round((goal.current / goal.target) * 100);
-            
+          {!isLoading && goals.map((goal, index) => {
+            const percent = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
+            const isNearTarget = percent >= 90 && percent < 100;
+
             return (
-              <div key={goal.id} className="group relative bg-[#172c3c] rounded-[3rem] p-8 text-white overflow-hidden shadow-2xl transition-all hover:-translate-y-2">
-                
-                {/* Indicador Flutuante de Porcentagem */}
+              <div 
+                key={goal.id} 
+                style={{ animationDelay: `${index * 100}ms` }}
+                className={`
+                  group relative bg-[#172c3c] rounded-[3rem] p-8 text-white overflow-hidden shadow-2xl transition-all duration-500 animate-in zoom-in-95
+                  ${isNearTarget ? 'ring-4 ring-[#e6b33d] ring-offset-4 ring-offset-[#f0f2f5] animate-pulse-slow' : ''}
+                `}
+              >
+                {/* Alerta Pulsante */}
+                {isNearTarget && (
+                  <div className="absolute top-6 left-8 flex items-center gap-2 z-20">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e6b33d] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#e6b33d]"></span>
+                    </span>
+                    <span className="text-[8px] font-black uppercase text-[#e6b33d]">Tá batendo!</span>
+                  </div>
+                )}
+
                 <div className="absolute top-8 right-8 w-20 h-20 rounded-full border-2 border-white/10 flex items-center justify-center">
                   <span className="text-2xl font-black italic">{percent}%</span>
                 </div>
 
                 <div className="relative z-10">
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">{goal.deadline}</p>
-                  <h3 className="text-3xl font-black leading-tight mb-8 group-hover:text-[#e6b33d] transition-colors">
+                  <p className="text-[10px] font-black opacity-40 mb-1 mt-4 italic">
+                    {goal.deadline ? new Date(goal.deadline).toLocaleDateString('pt-BR') : 'Sem prazo'}
+                  </p>
+                  <h3 className="text-3xl font-black leading-tight mb-8 group-hover:text-[#e6b33d] transition-colors truncate">
                     {goal.title}
                   </h3>
 
                   <div className="space-y-6">
-                    {/* Visualizador de Progresso Customizado */}
-                    <div className="relative h-24 w-full bg-white/5 rounded-3xl p-4 flex flex-col justify-end overflow-hidden">
+                    <div className="relative h-28 w-full bg-white/5 rounded-3xl p-5 flex flex-col justify-end overflow-hidden border border-white/5">
                       <div 
-                        className={`absolute bottom-0 left-0 w-full transition-all duration-1000 ${goal.color}`} 
+                        className="absolute bottom-0 left-0 w-full transition-all duration-1000 ease-out bg-[#e6b33d]" 
                         style={{ height: `${percent}%`, opacity: 0.2 }}
                       />
-                      <p className="text-[10px] font-black opacity-40 mb-1">PROGRESSO ATUAL</p>
-                      <p className="text-2xl font-black leading-none">
-                        R$ {goal.current.toLocaleString()} <span className="text-xs opacity-30 font-normal">/ {goal.target.toLocaleString()}</span>
+                      <p className="text-[10px] font-black opacity-40 mb-1 uppercase">Progresso</p>
+                      <p className="text-2xl font-black italic">
+                        R$ {goal.currentAmount.toLocaleString()} <span className="text-[10px] opacity-30 font-normal">/ {goal.targetAmount.toLocaleString()}</span>
                       </p>
                     </div>
 
-                    {/* AÇÕES DE EDIÇÃO RÁPIDA (DAISY UI) */}
-                    <div className="flex gap-2 pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <label 
-                        htmlFor={`edit-modal-${goal.id}`} 
-                        className="btn btn-sm flex-1 bg-white/10 border-none text-white rounded-xl hover:bg-[#e6b33d] hover:text-[#172c3c]"
+                    <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                      <button 
+                        onClick={() => handleOpenModal(goal)}
+                        className="btn btn-sm flex-1 bg-white/10 border-none text-white rounded-xl hover:bg-white hover:text-[#172c3c] font-black text-[10px]"
                       >
-                        AJUSTAR VALOR
-                      </label>
-                      <button className="btn btn-sm bg-[#995052]/20 border-none text-[#995052] rounded-xl hover:bg-[#995052] hover:text-white">
+                        AJUSTAR
+                      </button>
+                      <button 
+                        onClick={() => {
+                            if(confirm("Apagar?")) deleteGoal.mutate({ id: goal.id });
+                        }}
+                        className="btn btn-sm bg-[#995052]/20 border-none text-[#995052] rounded-xl hover:bg-[#995052] hover:text-white"
+                      >
                         ✕
                       </button>
                     </div>
                   </div>
                 </div>
-
-                {/* MODAL DE EDIÇÃO DINÂMICO */}
-                <input type="checkbox" id={`edit-modal-${goal.id}`} className="modal-toggle" />
-                <div className="modal text-[#172c3c]">
-                  <div className="modal-box bg-white rounded-[3rem] p-10 max-w-sm">
-                    <h3 className="font-black text-2xl mb-2">Ajustar Meta</h3>
-                    <p className="text-xs opacity-50 mb-8 uppercase font-bold tracking-widest">{goal.title}</p>
-                    
-                    <div className="space-y-8">
-                      <div className="form-control">
-                        <label className="label flex justify-between">
-                          <span className="label-text font-black text-[10px] opacity-40">VALOR GUARDADO</span>
-                          <span className="font-black text-[#d96831]">R$ {goal.current}</span>
-                        </label>
-                        {/* Range Slider do DaisyUI */}
-                        <input type="range" min="0" max={goal.target} value={goal.current} className="range range-warning range-sm" />
-                      </div>
-
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-black text-[10px] opacity-40">DATA ALVO</span>
-                        </label>
-                        <input type="text" defaultValue={goal.deadline} className="input input-bordered w-full rounded-2xl font-bold bg-[#f0f2f5] border-none" />
-                      </div>
-                    </div>
-
-                    <div className="modal-action">
-                      <label htmlFor={`edit-modal-${goal.id}`} className="btn btn-block bg-[#172c3c] text-white rounded-2xl border-none">
-                        ATUALIZAR OBJETIVO
-                      </label>
-                    </div>
-                  </div>
-                  <label className="modal-backdrop" htmlFor={`edit-modal-${goal.id}`}>Close</label>
-                </div>
               </div>
             );
           })}
-
-          {/* CARD DE "ADD NOVO" ESTILIZADO */}
-          <div className="border-4 border-dashed border-[#172c3c]/10 rounded-[3rem] flex flex-col items-center justify-center p-10 group cursor-pointer hover:border-[#d96831]/30 transition-colors">
-            <div className="w-16 h-16 bg-[#172c3c]/5 rounded-full flex items-center justify-center text-4xl font-light opacity-20 group-hover:scale-110 group-hover:opacity-100 transition-all">
-              +
-            </div>
-            <p className="mt-4 font-black opacity-20 group-hover:opacity-100 uppercase tracking-tighter">Novo Projeto</p>
-          </div>
         </div>
 
+        {/* MODAL CRUD */}
+        {isModalOpen && (
+          <div className="modal modal-open backdrop-blur-sm transition-all duration-300">
+            <div className="modal-box bg-white border-4 border-[#172c3c] rounded-[2.5rem] p-8 max-w-md animate-in zoom-in-95">
+              <h3 className="font-black text-3xl uppercase italic mb-6 tracking-tighter">
+                {editingId ? 'Ajustar Meta' : 'Novo Sonho'}
+              </h3>
+              
+              <form onSubmit={handleSave} className="space-y-4">
+                <div className="form-control">
+                  <label className="label uppercase font-black text-[10px] opacity-40">O que vamos conquistar?</label>
+                  <input 
+                    type="text" required className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-bold" 
+                    value={formData.title}
+                    onChange={e => setFormData({...formData, title: e.target.value})}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label uppercase font-black text-[10px] opacity-40">Guardado (R$)</label>
+                    <input 
+                      type="number" step="0.01" className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-bold" 
+                      value={formData.currentAmount}
+                      onChange={e => setFormData({...formData, currentAmount: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label uppercase font-black text-[10px] opacity-40">Alvo (R$)</label>
+                    <input 
+                      type="number" step="0.01" required className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-black text-[#d96831]" 
+                      value={formData.targetAmount}
+                      onChange={e => setFormData({...formData, targetAmount: Number(e.target.value)})}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-control">
+                  <label className="label uppercase font-black text-[10px] opacity-40">Data Limite (Opcional)</label>
+                  <input 
+                    type="date" className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-bold" 
+                    value={formData.deadline}
+                    onChange={e => setFormData({...formData, deadline: e.target.value})}
+                  />
+                </div>
+
+                <div className="modal-action flex flex-col gap-2">
+                  <button 
+                    disabled={createGoal.isPending || updateGoal.isPending}
+                    type="submit" 
+                    className="btn btn-block bg-[#172c3c] text-white rounded-2xl border-none font-black h-14 hover:bg-[#d96831]"
+                  >
+                    {(createGoal.isPending || updateGoal.isPending) ? 'SALVANDO...' : 'CONFIRMAR'}
+                  </button>
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-ghost font-bold opacity-30">CANCELAR</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
+
+      <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} onAddClick={() => handleOpenModal()} />
+      
+      <style jsx global>{`
+        @keyframes pulse-slow {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 3s infinite ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }

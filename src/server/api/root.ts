@@ -1,5 +1,8 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { operacoesRouter } from "./routers/operacoes";
+import { metasRouter } from "./routers/metas";
+import { limitesRouter } from "./routers/limites";
+import { faturaRouter } from "./routers/fatura";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +11,9 @@ import { operacoesRouter } from "./routers/operacoes";
  */
 export const appRouter = createTRPCRouter({
   operacoes: operacoesRouter,
+  metas: metasRouter,
+  limites: limitesRouter,
+  faturas: faturaRouter,
 });
 
 // export type definition of API
