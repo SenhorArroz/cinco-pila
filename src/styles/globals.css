@@ -1,6 +1,21 @@
 @import "tailwindcss";
 
+/* Importa o DaisyUI como um plugin do Tailwind v4 */
+@plugin "daisyui";
+
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Definindo sua paleta de cores diretamente no tema v4 */
+  --color-brand-dark: #172c3c;   /* .color1 */
+  --color-brand-navy: #274862;   /* .color2 */
+  --color-brand-wine: #995052;   /* .color3 */
+  --color-brand-orange: #d96831; /* .color4 */
+  --color-brand-gold: #e6b33d;   /* .color5 */
+  
+  /* Mapeando para as variáveis do DaisyUI */
+  --color-primary: var(--color-brand-dark);
+  --color-secondary: var(--color-brand-navy);
+  --color-accent: var(--color-brand-orange);
 }
