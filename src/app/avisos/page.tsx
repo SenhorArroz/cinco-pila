@@ -158,6 +158,7 @@ export default function AvisosPage() {
         </div>
       </div>
         <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className='p-4 md:p-10 pb-32'></div>
       
     </div>
   );
