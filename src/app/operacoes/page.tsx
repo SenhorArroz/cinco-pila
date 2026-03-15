@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import FloatingNav, { type Tab } from '../_components/FloatingNav';
 import { api } from '~/trpc/react';
 
@@ -31,10 +31,12 @@ export default function GestaoFinanceira() {
   // --- ESTADOS DO MODAL ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  
+  // O segredo está aqui: o valor no input é uma string para aceitar o ponto
+  const [inputValue, setInputValue] = useState(""); 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    value: 0,
     type: 'EXPENSE' as 'INCOME' | 'EXPENSE'
   });
 
@@ -56,22 +58,30 @@ export default function GestaoFinanceira() {
       setFormData({
         title: item.title,
         description: item.description ?? '',
-        value: item.value,
         type: item.type as 'INCOME' | 'EXPENSE',
       });
+      setInputValue(item.value.toString());
     } else {
       setEditingId(null);
-      setFormData({ title: '', description: '', value: 0, type: 'EXPENSE' });
+      setFormData({ title: '', description: '', type: 'EXPENSE' });
+      setInputValue("");
     }
     setIsModalOpen(true);
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    // Converte a string para float apenas na hora de salvar
+    const finalValue = parseFloat(inputValue.replace(',', '.'));
+    
+    if (isNaN(finalValue)) return alert("Valor inválido");
+
+    const payload = { ...formData, value: finalValue };
+
     if (editingId) {
-      updateOp.mutate({ id: editingId, ...formData });
+      updateOp.mutate({ id: editingId, ...payload });
     } else {
-      createOp.mutate(formData);
+      createOp.mutate(payload);
     }
   };
 
@@ -96,7 +106,6 @@ export default function GestaoFinanceira() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
           {/* ASIDE DE RESUMO */}
           <aside className="lg:col-span-4 space-y-6">
             <div className="bg-[#274862] p-8 rounded-[2.5rem] text-white shadow-xl">
@@ -104,16 +113,16 @@ export default function GestaoFinanceira() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-emerald-400">
                   <span className="text-xs font-bold opacity-60 text-white">Entradas</span>
-                  <span className="font-black">+ R$ {totals.income.toFixed(2)}</span>
+                  <span className="font-black">+ R$ {totals.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-white/10 pb-4 text-[#995052]">
                   <span className="text-xs font-bold opacity-60 text-white">Saídas</span>
-                  <span className="font-black">- R$ {totals.expense.toFixed(2)}</span>
+                  <span className="font-black">- R$ {totals.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div className="pt-2">
                   <p className="text-[10px] font-black opacity-40 uppercase mb-1">Saldo em Conta</p>
                   <p className={`text-4xl font-black italic ${balance >= 0 ? 'text-[#e6b33d]' : 'text-red-400'}`}>
-                    R$ {balance.toFixed(2)}
+                    R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
               </div>
@@ -129,7 +138,7 @@ export default function GestaoFinanceira() {
               <div className="mt-4 h-3 w-full bg-[#f0f2f5] rounded-full overflow-hidden p-1 border border-black/5">
                 <div
                   className="h-full bg-[#172c3c] rounded-full transition-all duration-1000"
-                  style={{ width: `${Math.max(0, Math.min(100, (balance / totals.income) * 100))}%` }}
+                  style={{ width: `${Math.max(0, Math.min(100, totals.income > 0 ? (balance / totals.income) * 100 : 0))}%` }}
                 />
               </div>
             </div>
@@ -163,7 +172,7 @@ export default function GestaoFinanceira() {
                             </div>
                           </td>
                           <td className={`font-black italic text-lg ${item.type === 'INCOME' ? 'text-emerald-600' : 'text-[#995052]'}`}>
-                            {item.type === 'INCOME' ? '+' : '-'} R$ {item.value.toLocaleString()}
+                            {item.type === 'INCOME' ? '+' : '-'} R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </td>
                           <td className="text-right p-6">
                             <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -189,13 +198,13 @@ export default function GestaoFinanceira() {
 
       {/* --- MODAL --- */}
       {isModalOpen && (
-        <div className="modal modal-open backdrop-blur-sm">
-          <div className="modal-box bg-white border-4 border-[#172c3c] rounded-[3rem] p-10">
-            <h3 className="font-black text-3xl italic uppercase mb-8 text-[#172c3c]">
+        <div className="modal modal-open backdrop-blur-sm p-4">
+          <div className="modal-box bg-white border-4 border-[#172c3c] rounded-[3rem] p-6 md:p-10 max-w-lg w-full">
+            <h3 className="font-black text-2xl md:text-3xl italic uppercase mb-8 text-[#172c3c]">
               {editingId ? 'Ajustar Registro' : 'Lançar no Caixa'}
             </h3>
 
-            <form onSubmit={handleSave} className="space-y-6">
+            <form onSubmit={handleSave} className="space-y-4 md:space-y-6">
               <div className="form-control">
                 <label className="label uppercase font-black text-[10px] opacity-40">Título</label>
                 <input
@@ -205,13 +214,22 @@ export default function GestaoFinanceira() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-control">
                   <label className="label uppercase font-black text-[10px] opacity-40">Valor (R$)</label>
+                  {/* Mudança chave: type text com inputmode decimal para abrir o teclado numérico sem quebrar o ponto */}
                   <input
-                    type="number" step="0.01" required className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5]"
-                    value={formData.value}
-                    onChange={e => setFormData({ ...formData, value: Number(e.target.value) })}
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    required
+                    className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5]"
+                    value={inputValue}
+                    onChange={e => {
+                      // Permite apenas números, ponto e vírgula
+                      const val = e.target.value.replace(/[^0-9.,]/g, "");
+                      setInputValue(val);
+                    }}
                   />
                 </div>
                 <div className="form-control">
@@ -236,12 +254,12 @@ export default function GestaoFinanceira() {
                 />
               </div>
 
-              <div className="modal-action">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-ghost font-black opacity-30">FECHAR</button>
+              <div className="modal-action flex-col md:flex-row gap-2">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-ghost font-black opacity-30 order-2 md:order-1">FECHAR</button>
                 <button
                   disabled={createOp.isPending || updateOp.isPending}
                   type="submit"
-                  className="btn bg-[#172c3c] text-white border-none rounded-2xl px-10 font-black flex-1"
+                  className="btn bg-[#172c3c] text-white border-none rounded-2xl px-10 font-black flex-1 order-1 md:order-2"
                 >
                   {(createOp.isPending || updateOp.isPending) ? 'SALVANDO...' : 'CONFIRMAR'}
                 </button>
@@ -251,7 +269,6 @@ export default function GestaoFinanceira() {
         </div>
       )}
       <div className='p-5 md:p-15 pb-32'></div>
-
     </div>
   );
 }
