@@ -11,17 +11,15 @@ import ReactMarkdown from "react-markdown";
 import { differenceInDays, isPast, isToday } from "date-fns";
 import dynamic from "next/dynamic";
 
-// --- IMPORT DINÂMICO DO RECHARTS ---
-// Isso garante que o gráfico não seja renderizado no servidor (SSR),
-// resolvendo o problema de sumir em produção.
-const ResponsiveContainer = dynamic(() => import("recharts").then(mod => mod.ResponsiveContainer), { ssr: false });
-const BarChart = dynamic(() => import("recharts").then(mod => mod.BarChart), { ssr: false });
-const Bar = dynamic(() => import("recharts").then(mod => mod.Bar), { ssr: false });
-const XAxis = dynamic(() => import("recharts").then(mod => mod.XAxis), { ssr: false });
-const Tooltip = dynamic(() => import("recharts").then(mod => mod.Tooltip), { ssr: false });
-const Cell = dynamic(() => import("recharts").then(mod => mod.Cell), { ssr: false });
+// --- TRAVA DE PRODUÇÃO: IMPORT DINÂMICO DO RECHARTS ---
+const ResponsiveContainer = dynamic(() => import("recharts").then(m => m.ResponsiveContainer), { ssr: false });
+const BarChart = dynamic(() => import("recharts").then(m => m.BarChart), { ssr: false });
+const Bar = dynamic(() => import("recharts").then(m => m.Bar), { ssr: false });
+const XAxis = dynamic(() => import("recharts").then(m => m.XAxis), { ssr: false });
+const Tooltip = dynamic(() => import("recharts").then(m => m.Tooltip), { ssr: false });
+const Cell = dynamic(() => import("recharts").then(m => m.Cell), { ssr: false });
 
-// Componentes internos
+// Componentes internos (certifique-se de que os caminhos estão corretos)
 import FloatingNav, { type Tab } from "../_components/FloatingNav";
 import DashBoardLimit from "../_components/DashBoardLimit";
 import MetasDashboard from "../_components/MetasDashboard";
@@ -69,7 +67,7 @@ export default function DashboardCincoPila() {
   const [aiEnabled, setAiEnabled] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  // Garante que o componente montou no cliente antes de mostrar o gráfico
+  // --- TRAVA DE HIDRATAÇÃO ---
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem("cinco-pila-ai-enabled");
@@ -86,9 +84,7 @@ export default function DashboardCincoPila() {
   const { data: avisosDB } = api.avisos.getAll.useQuery(undefined, { enabled: status === "authenticated" });
 
   const resolverAviso = api.avisos.resolver.useMutation({
-    onSuccess: () => {
-      void utils.avisos.getAll.invalidate();
-    }
+    onSuccess: () => { void utils.avisos.getAll.invalidate(); }
   });
 
   const handleToggleAI = () => {
@@ -133,11 +129,7 @@ export default function DashboardCincoPila() {
       const totalGasto = todasOperacoes
         .filter((op) => {
           const opDate = new Date(op.createdAt);
-          return (
-            op.type === "EXPENSE" && 
-            opDate.getMonth() === d.getMonth() && 
-            opDate.getFullYear() === d.getFullYear()
-          );
+          return op.type === "EXPENSE" && opDate.getMonth() === d.getMonth() && opDate.getFullYear() === d.getFullYear();
         })
         .reduce((acc, curr) => acc + curr.value, 0);
 
@@ -145,7 +137,7 @@ export default function DashboardCincoPila() {
     });
   }, [todasOperacoes]);
 
-  if (status === "loading") {
+  if (!mounted || status === "loading") {
     return (
       <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#172c3c]" />
@@ -188,7 +180,7 @@ export default function DashboardCincoPila() {
                       <span>R$ {entradasHoje.toLocaleString("pt-BR")}</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${(entradasHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
+                      <div className="h-full bg-emerald-500" style={{ width: `${(entradasHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
                     </div>
                   </div>
                   <div>
@@ -197,7 +189,7 @@ export default function DashboardCincoPila() {
                       <span>R$ {gastosHoje.toLocaleString("pt-BR")}</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#995052] transition-all duration-700" style={{ width: `${(gastosHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
+                      <div className="h-full bg-[#995052]" style={{ width: `${(gastosHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
                     </div>
                   </div>
                 </div>
@@ -208,32 +200,15 @@ export default function DashboardCincoPila() {
                 <Bell size={14} className="text-[#d96831]" /> Agenda e Alertas
               </p>
               <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
-                {avisosDB?.length === 0 && (
-                  <div className="h-full flex flex-col items-center justify-center opacity-10">
-                    <CheckCircle2 size={40} />
-                    <p className="text-[10px] font-black uppercase mt-2">Nada pendente</p>
-                  </div>
-                )}
+                {avisosDB?.length === 0 && <p className="text-[10px] font-black opacity-10 text-center mt-20">LIMPO</p>}
                 {avisosDB?.map((a) => {
-                  const dataAviso = new Date(a.data);
-                  const diasParaVencer = differenceInDays(dataAviso, new Date());
-                  const vencido = isPast(dataAviso) && !isToday(dataAviso);
-                  const venceHoje = isToday(dataAviso);
+                  const d = new Date(a.data);
+                  const vencido = isPast(d) && !isToday(d);
                   return (
-                    <div key={a.id} className={`group p-4 rounded-2xl border-l-4 transition-all relative ${vencido || venceHoje ? 'border-[#995052] bg-red-50/50' : 'border-[#172c3c] bg-slate-50'}`}>
-                      <button onClick={() => resolverAviso.mutate({ id: a.id })} className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-all p-1 bg-[#172c3c] text-[#e6b33d] rounded-full">
-                        <CheckCircle2 size={12} />
-                      </button>
-                      <div className="flex justify-between items-start mb-1">
-                        <p className="text-[10px] font-black uppercase italic leading-tight truncate w-3/4">{a.nome}</p>
-                        <span className="text-[9px] font-black">R$ {a.valor.toFixed(0)}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar size={10} className={vencido ? "text-[#995052]" : "text-[#d96831]"}/>
-                        <p className={`text-[8px] font-bold uppercase ${vencido ? 'text-[#995052]' : 'opacity-40'}`}>
-                          {vencido ? "Atrasado" : venceHoje ? "Vence Hoje" : `Em ${diasParaVencer + 1} dias`}
-                        </p>
-                      </div>
+                    <div key={a.id} className={`p-4 rounded-2xl border-l-4 relative ${vencido || isToday(d) ? 'border-[#995052] bg-red-50/50' : 'border-[#172c3c] bg-slate-50'}`}>
+                      <button onClick={() => resolverAviso.mutate({ id: a.id })} className="absolute right-2 top-2 p-1 bg-[#172c3c] text-[#e6b33d] rounded-full"><CheckCircle2 size={12} /></button>
+                      <p className="text-[10px] font-black uppercase italic leading-tight truncate w-3/4">{a.nome}</p>
+                      <p className="text-[9px] font-black opacity-40">R$ {a.valor.toFixed(0)} • {isToday(d) ? "HOJE" : format(d, 'dd/MM')}</p>
                     </div>
                   );
                 })}
@@ -244,52 +219,33 @@ export default function DashboardCincoPila() {
           {/* COLUNA CENTRAL - GRÁFICO BLINDADO */}
           <div className="lg:col-span-6 space-y-6">
             <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xs font-black uppercase italic tracking-widest flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
-                </h3>
-              </div>
+              <h3 className="text-xs font-black uppercase italic mb-6 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
+              </h3>
               
               <div className="h-[250px] w-full min-w-0">
-                {/* O mounted garante que o Recharts só carregue no navegador */}
-                {mounted && chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                {chartData.length > 0 ? (
+                  <ResponsiveContainer width="99%" height="100%">
                     <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                       <Tooltip 
-                        cursor={{ fill: "#172c3c", fillOpacity: 0.05 }} 
-                        content={({ active, payload }) => {
-                          if (active && payload?.length) {
-                            return (
-                              <div className="bg-[#172c3c] p-2 rounded-lg text-white font-black text-[10px] italic shadow-xl">
-                                R$ {Number(payload[0]?.value).toLocaleString("pt-BR")}
-                              </div>
-                            );
-                          }
-                          return null;
-                        }} 
+                        cursor={{ fill: "#172c3c", fillOpacity: 0.05 }}
+                        content={({ active, payload }) => active && payload?.[0] ? (
+                          <div className="bg-[#172c3c] p-2 rounded-lg text-white font-black text-[10px]">
+                            R$ {Number(payload[0].value).toLocaleString("pt-BR")}
+                          </div>
+                        ) : null}
                       />
                       <Bar dataKey="value" radius={[6, 6, 6, 6]} barSize={35}>
                         {chartData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={entry.isAtual ? "#d96831" : "#172c3c"} 
-                            fillOpacity={entry.isAtual ? 1 : 0.1}
-                          />
+                          <Cell key={`cell-${index}`} fill={entry.isAtual ? "#d96831" : "#172c3c"} fillOpacity={entry.isAtual ? 1 : 0.1} />
                         ))}
                       </Bar>
-                      <XAxis 
-                        dataKey="name" 
-                        axisLine={false} 
-                        tickLine={false} 
-                        tick={{ fontSize: 10, fontWeight: 900, fill: "#172c3c", opacity: 0.4 }} 
-                      />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: "#172c3c", opacity: 0.4 }} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl">
-                     <p className="text-[10px] font-black uppercase opacity-20">
-                       {mounted ? "Sem dados financeiros" : "Carregando gráfico..."}
-                     </p>
+                  <div className="h-full flex items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl opacity-20">
+                    <p className="text-[10px] font-black uppercase">Sem dados</p>
                   </div>
                 )}
               </div>
@@ -307,68 +263,43 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* COLUNA DIREITA */}
+          {/* COLUNA DIREITA - IA */}
           <div className="lg:col-span-3 space-y-6">
-            <div className={`bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden transition-all duration-300 ${!aiEnabled ? 'opacity-80' : ''}`}>
+            <div className={`bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden ${!aiEnabled ? 'opacity-80' : ''}`}>
               <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
                 <div className="p-1.5 bg-[#e6b33d] rounded-lg"><Bot size={16} className="text-[#172c3c]" /></div>
                 <div>
                   <p className="text-[10px] font-black uppercase leading-none">Cinco Pila AI</p>
                   <p className="text-[8px] opacity-60 font-black italic">{aiEnabled ? "Modo Ativo" : "Privado"}</p>
                 </div>
-                <div className="dropdown dropdown-end ml-auto">
-                  <label tabIndex={0} className="btn btn-ghost btn-xs btn-circle text-[#e6b33d]">
-                    <Sparkles size={14} className={aiEnabled ? "animate-pulse" : "opacity-20"} />
-                  </label>
-                  <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow-2xl bg-[#172c3c] border border-white/10 rounded-2xl w-48 mt-2">
-                    <li>
-                      <button onClick={handleToggleAI} className="text-[10px] font-black uppercase flex justify-between hover:bg-white/5 active:bg-[#d96831]">
-                        {aiEnabled ? (<>Desligar IA <EyeOff size={14} className="text-[#995052]" /></>) : (<>Ligar IA <Zap size={14} className="text-[#e6b33d]" /></>)}
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+                <button onClick={handleToggleAI} className="ml-auto text-[#e6b33d]"><Sparkles size={14} className={aiEnabled ? "animate-pulse" : "opacity-20"} /></button>
               </div>
               {aiEnabled ? (
                 <>
-                  <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50 space-y-4">
-                    <div className={`p-4 rounded-2xl shadow-sm border ${isAnalyzing ? 'opacity-50' : 'opacity-100'} transition-opacity bg-white border-black/5`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 rounded-full bg-[#e6b33d]" />
-                        <span className="text-[9px] font-black uppercase opacity-40 italic text-[#172c3c]">Insight</span>
-                      </div>
-                      <div className="text-[11px] font-medium leading-relaxed text-[#172c3c]">
-                        <ReactMarkdown components={{ 
-                          strong: ({node, ...props}) => <span className="font-black text-[#d96831]" {...props} />,
-                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />
-                        }}>
-                          {aiResponse}
-                        </ReactMarkdown>
-                      </div>
+                  <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50">
+                    <div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed">
+                      <ReactMarkdown>{aiResponse}</ReactMarkdown>
                     </div>
                   </div>
                   <div className="p-3 bg-white border-t border-black/5">
                     <div className="relative flex items-center">
-                      <input type="text" value={geminiPrompt} onChange={(e) => setGeminiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleGeminiAnalysis()} placeholder="Pergunte algo..." className="w-full bg-slate-100 rounded-xl py-3 px-4 pr-12 text-xs font-bold outline-none text-[#172c3c] focus:ring-1 ring-[#e6b33d]" />
-                      <button onClick={handleGeminiAnalysis} disabled={isAnalyzing} className="absolute right-2 p-2 bg-[#172c3c] text-[#e6b33d] rounded-lg disabled:opacity-50"><Send size={14} /></button>
+                      <input type="text" value={geminiPrompt} onChange={(e) => setGeminiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleGeminiAnalysis()} placeholder="Pergunte..." className="w-full bg-slate-100 rounded-xl py-3 px-4 pr-12 text-xs font-bold outline-none" />
+                      <button onClick={handleGeminiAnalysis} disabled={isAnalyzing} className="absolute right-2 p-2 bg-[#172c3c] text-[#e6b33d] rounded-lg"><Send size={14} /></button>
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[#f8f9fa]">
-                  <ShieldCheck size={32} className="text-[#172c3c] opacity-10 mb-2" />
-                  <p className="text-[9px] font-black uppercase italic text-[#172c3c] opacity-40">Privacidade Ativa</p>
-                </div>
+                <div className="flex-1 flex flex-col items-center justify-center p-8 opacity-10"><ShieldCheck size={32} /></div>
               )}
             </div>
-
-            <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl relative overflow-hidden group">
-              <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Fluxo Recente</h3>
+            
+            <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl overflow-hidden">
+              <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Recentes</h3>
               <div className="space-y-3">
-                {todasOperacoes?.slice(0, 6).map((op) => (
+                {todasOperacoes?.slice(0, 4).map((op) => (
                   <div key={op.id} className="flex justify-between items-center border-b border-white/5 pb-2">
-                    <p className="text-[9px] font-black uppercase truncate w-24 italic leading-none">{op.title}</p>
-                    <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>
+                    <p className="text-[9px] font-black uppercase truncate w-24 italic">{op.title}</p>
+                    <p className={`text-[10px] font-black ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>
                       {op.type === "EXPENSE" ? "-" : "+"} {op.value.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
                     </p>
                   </div>
