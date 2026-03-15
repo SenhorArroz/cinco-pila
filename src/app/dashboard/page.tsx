@@ -88,18 +88,27 @@ export default function DashboardCincoPila() {
   const totalFluxo = entradasHoje + gastosHoje;
 
   const chartData = useMemo(() => {
-    if (!todasOperacoes || todasOperacoes.length === 0) return [];
+    if (!todasOperacoes) return [];
     const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const hoje = new Date();
+    
     return Array.from({ length: 7 }).map((_, i) => {
       const d = new Date(hoje.getFullYear(), hoje.getMonth() - (6 - i), 1);
+      const mesIndex = d.getMonth();
+      const nomeMes = mesesNomes[mesIndex] ?? "---"; // Garante que nunca seja undefined
+
       const totalGasto = todasOperacoes
         .filter((op) => {
           const opDate = new Date(op.createdAt);
-          return op.type === "EXPENSE" && opDate.getMonth() === d.getMonth() && opDate.getFullYear() === d.getFullYear();
+          return op.type === "EXPENSE" && opDate.getMonth() === mesIndex && opDate.getFullYear() === d.getFullYear();
         })
         .reduce((acc, curr) => acc + curr.value, 0);
-      return { name: mesesNomes[d.getMonth()], value: totalGasto, isAtual: i === 6 };
+
+      return { 
+        name: nomeMes, 
+        value: totalGasto, 
+        isAtual: i === 6 
+      };
     });
   }, [todasOperacoes]);
 
@@ -180,16 +189,18 @@ export default function DashboardCincoPila() {
                 <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
               </h3>
               
-              <div className="h-[280px] w-full" style={{ minHeight: '280px' }}>
-                {chartData.length > 0 ? (
-                  <SafeChart data={chartData} />
-                ) : (
-                  <div className="h-full flex items-center justify-center opacity-10 font-black text-xs uppercase">Sem dados</div>
-                )}
-              </div>
+              <div className="h-[280px] w-full flex items-end">
+  {chartData.length > 0 ? (
+                <SafeChart data={chartData} />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center opacity-10 font-black text-xs uppercase italic">
+                  Aguardando dados...
+                </div>
+              )}
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-3">
                   <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Zap size={12} className="text-[#e6b33d]"/> Limites</p>
                   <AutoCarousel>{limits?.map((l, idx) => <DashBoardLimit key={l.id} l={l} index={idx} />)}</AutoCarousel>
