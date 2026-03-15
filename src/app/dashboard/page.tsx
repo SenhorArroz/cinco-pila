@@ -4,17 +4,18 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 import { 
-  TrendingUp, Zap, Target, Sparkles, Send, 
-  Bot, EyeOff, ShieldCheck, Calendar, Bell, CheckCircle2 
+  TrendingUp, Zap, Target, Send, 
+  Bot, Bell, CheckCircle2 
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { format } from "date-fns";
 import dynamic from "next/dynamic";
 
-// --- GRÁFICO ISOLADO (ESTRATÉGIA DE SEGURANÇA VERCEL) ---
+// --- COMPONENTE DE FLUXO SEMESTRAL (SUBSTITUTO DO GRÁFICO BUGADO) ---
+// Usamos dynamic apenas para garantir que o componente SafeChart seja carregado no cliente
 const SafeChart = dynamic(() => import("../_components/SafeChart"), { 
   ssr: false,
-  loading: () => <div className="h-[280px] w-full bg-transparent animate-pulse rounded-[3rem]" />
+  loading: () => <div className="h-[280px] w-full bg-transparent animate-pulse" />
 });
 
 import FloatingNav, { type Tab } from "../_components/FloatingNav";
@@ -61,7 +62,6 @@ export default function DashboardCincoPila() {
   const [geminiPrompt, setGeminiPrompt] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiResponse, setAiResponse] = useState("Diz aí, meu nobre! Como tá o patrimônio hoje?");
-  const [aiEnabled, setAiEnabled] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -82,20 +82,20 @@ export default function DashboardCincoPila() {
     onSuccess: () => { void utils.avisos.getAll.invalidate(); }
   });
 
-  // Cálculos de Progresso
+  // Cálculos de Progresso Diário
   const entradasHoje = dailyIncomes?.reduce((acc, op) => acc + op.value, 0) ?? 0;
   const gastosHoje = dailyExpenses?.reduce((acc, op) => acc + op.value, 0) ?? 0;
-  const totalFluxo = entradasHoje + gastosHoje;
+  const totalFluxoDiario = entradasHoje + gastosHoje;
 
   const chartData = useMemo(() => {
     if (!todasOperacoes) return [];
     const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const hoje = new Date();
     
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(hoje.getFullYear(), hoje.getMonth() - (6 - i), 1);
+    return Array.from({ length: 6 }).map((_, i) => {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - (5 - i), 1);
       const mesIndex = d.getMonth();
-      const nomeMes = mesesNomes[mesIndex] ?? "---"; // Garante que nunca seja undefined
+      const nomeMes = mesesNomes[mesIndex] ?? "---";
 
       const totalGasto = todasOperacoes
         .filter((op) => {
@@ -107,7 +107,7 @@ export default function DashboardCincoPila() {
       return { 
         name: nomeMes, 
         value: totalGasto, 
-        isAtual: i === 6 
+        isAtual: i === 5 
       };
     });
   }, [todasOperacoes]);
@@ -149,7 +149,7 @@ export default function DashboardCincoPila() {
                       <span>R$ {entradasHoje.toLocaleString("pt-BR")}</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${totalFluxo > 0 ? (entradasHoje/totalFluxo)*100 : 0}%` }} />
+                      <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${totalFluxoDiario > 0 ? (entradasHoje/totalFluxoDiario)*100 : 0}%` }} />
                     </div>
                   </div>
                   <div>
@@ -158,7 +158,7 @@ export default function DashboardCincoPila() {
                       <span>R$ {gastosHoje.toLocaleString("pt-BR")}</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#995052] transition-all duration-700" style={{ width: `${totalFluxo > 0 ? (gastosHoje/totalFluxo)*100 : 0}%` }} />
+                      <div className="h-full bg-[#995052] transition-all duration-700" style={{ width: `${totalFluxoDiario > 0 ? (gastosHoje/totalFluxoDiario)*100 : 0}%` }} />
                     </div>
                   </div>
                 </div>
@@ -182,25 +182,26 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* COLUNA CENTRAL: GRÁFICO (RECHARTS FIX) */}
+          {/* COLUNA CENTRAL: FLUXO SEMESTRAL INTELIGENTE */}
           <div className="lg:col-span-6 space-y-6">
             <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5">
-              <h3 className="text-xs font-black uppercase italic mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-black uppercase italic mb-8 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
               </h3>
               
-              <div className="h-[280px] w-full flex items-end">
-  {chartData.length > 0 ? (
-                <SafeChart data={chartData} />
-              ) : (
-                <div className="h-full w-full flex items-center justify-center opacity-10 font-black text-xs uppercase italic">
-                  Aguardando dados...
-                </div>
-              )}
+              <div className="w-full">
+                {chartData.length > 0 ? (
+                  <SafeChart data={chartData} />
+                ) : (
+                  <div className="py-20 flex flex-col items-center justify-center opacity-10">
+                    <TrendingUp size={40} />
+                    <p className="text-[10px] font-black uppercase mt-2">Sem histórico disponível</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-3">
                   <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Zap size={12} className="text-[#e6b33d]"/> Limites</p>
                   <AutoCarousel>{limits?.map((l, idx) => <DashBoardLimit key={l.id} l={l} index={idx} />)}</AutoCarousel>

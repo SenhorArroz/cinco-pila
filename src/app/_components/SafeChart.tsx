@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
+import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 
 interface ChartData {
-  name?: string; // Interrogação aqui resolve o erro de "undefined"
+  name: string;
   value: number;
   isAtual: boolean;
 }
@@ -10,59 +11,51 @@ interface ChartData {
 export default function SafeChart({ data }: { data: ChartData[] }) {
   if (!data || data.length === 0) return null;
 
-  const maxValue = Math.max(...data.map((d) => d.value), 1);
-  const chartHeight = 200; 
-  const barWidth = 40;
-  const gap = 20;
+  const maxGasto = Math.max(...data.map(d => d.value), 1);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-end min-h-[250px]">
-      <svg 
-        viewBox={`0 0 ${data.length * (barWidth + gap)} ${chartHeight + 40}`} 
-        className="w-full h-full"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {data.map((entry, i) => {
-          const barHeight = (entry.value / maxValue) * chartHeight;
-          const x = i * (barWidth + gap);
-          const y = chartHeight - barHeight;
+    <div className="w-full space-y-5 py-2">
+      {data.map((mes, i) => {
+        const anterior = data[i - 1];
+        const subiu = anterior ? mes.value > anterior.value : false;
+        const desceu = anterior ? mes.value < anterior.value : false;
+        const percentual = (mes.value / maxGasto) * 100;
 
-          return (
-            <g key={i} className="group cursor-pointer">
-              <title>{`${entry.name ?? "Mês"}: R$ ${entry.value.toLocaleString("pt-BR")}`}</title>
+        return (
+          <div key={i} className={`flex flex-col gap-1.5 ${mes.isAtual ? "opacity-100" : "opacity-40"}`}>
+            <div className="flex justify-between items-end">
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-black uppercase italic ${mes.isAtual ? "text-[#d96831]" : "text-[#172c3c]"}`}>
+                  {mes.name}
+                </span>
+                {mes.isAtual && (
+                  <span className="bg-[#d96831] text-white text-[7px] px-1.5 py-0.5 rounded-full font-black animate-pulse">
+                    HOJE
+                  </span>
+                )}
+              </div>
               
-              {/* Barra de Fundo */}
-              <rect x={x} y={0} width={barWidth} height={chartHeight} rx={8} fill="#172c3c" fillOpacity={0.03} />
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-black italic">
+                  R$ {mes.value.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                </span>
+                {anterior && (
+                  subiu ? <ArrowUpRight size={14} className="text-red-500" /> : 
+                  desceu ? <ArrowDownRight size={14} className="text-emerald-500" /> : 
+                  <Minus size={14} className="text-slate-300" />
+                )}
+              </div>
+            </div>
 
-              {/* Barra de Valor com Transição */}
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                rx={8}
-                fill={entry.isAtual ? "#d96831" : "#172c3c"}
-                fillOpacity={entry.isAtual ? 1 : 0.1}
-                className="transition-all duration-700"
+            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-1000 ${mes.isAtual ? "bg-[#d96831]" : "bg-[#172c3c]"}`}
+                style={{ width: `${Math.max(percentual, 2)}%` }}
               />
-
-              {/* Label do Mês - Usando ?? para garantir string */}
-              <text
-                x={x + barWidth / 2}
-                y={chartHeight + 25}
-                textAnchor="middle"
-                fontSize="12"
-                fontWeight="900"
-                fill="#172c3c"
-                opacity={0.4}
-                className="italic uppercase"
-              >
-                {entry.name ?? "---"}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
