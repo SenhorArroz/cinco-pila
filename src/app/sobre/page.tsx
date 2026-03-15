@@ -131,13 +131,6 @@ export default function AboutPage() {
         <footer className="bg-[#172c3c] py-20 border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
             <img src={logoUrl} width="60" alt="" className="mb-8" />
-            <div className="flex gap-8 mb-12">
-                {['Instagram', 'LinkedIn', 'Github'].map(link => (
-                    <a key={link} href="#" className="text-xs font-black uppercase tracking-[0.3em] text-white/30 hover:text-[#e6b33d] transition-colors">
-                        {link}
-                    </a>
-                ))}
-            </div>
             <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em]">
                 Cinco Pila 
             </p>
