@@ -8,19 +8,20 @@ import {
 
 export const limitesRouter = createTRPCRouter({
     create: protectedProcedure
-    .input(z.object({ title: z.string().min(1), limitAmount: z.number(), currentSpent: z.number() }))
+    .input(z.object({ title: z.string().min(1), limitAmount: z.number(), currentSpent: z.number(), color: z.string() }))
     .mutation(async ({ ctx, input }) => {
         return ctx.db.limit.create({
             data: {
                 title: input.title,
                 limitAmount: input.limitAmount,
                 currentSpent: input.currentSpent,
+                color: input.color,
                 user: { connect: { id: ctx.session.user.id } },
             },
         });
     }),
     update: protectedProcedure
-    .input(z.object({ id: z.string().min(1), title: z.string().min(1), limitAmount: z.number(), currentSpent: z.number() }))
+    .input(z.object({ id: z.string().min(1), title: z.string().min(1), limitAmount: z.number(), currentSpent: z.number(), color: z.string() }))
     .mutation(async ({ ctx, input }) => {
         return ctx.db.limit.update({
             where: { id: input.id },
@@ -28,6 +29,7 @@ export const limitesRouter = createTRPCRouter({
                 title: input.title,
                 limitAmount: input.limitAmount,
                 currentSpent: input.currentSpent,
+                color: input.color,
             },
         });
     }),

@@ -29,6 +29,11 @@ export type Account = $Result.DefaultSelection<Prisma.$AccountPayload>
  */
 export type Session = $Result.DefaultSelection<Prisma.$SessionPayload>
 /**
+ * Model Aviso
+ * 
+ */
+export type Aviso = $Result.DefaultSelection<Prisma.$AvisoPayload>
+/**
  * Model Transaction
  * 
  */
@@ -53,7 +58,27 @@ export type CreditCard = $Result.DefaultSelection<Prisma.$CreditCardPayload>
  * Enums
  */
 export namespace $Enums {
-  export const TransactionType: {
+  export const AvisoTipo: {
+  AVISO: 'AVISO',
+  VENCIMENTO: 'VENCIMENTO',
+  COBRANCA: 'COBRANCA'
+};
+
+export type AvisoTipo = (typeof AvisoTipo)[keyof typeof AvisoTipo]
+
+
+export const Recorrencia: {
+  NENHUMA: 'NENHUMA',
+  DIARIA: 'DIARIA',
+  SEMANAL: 'SEMANAL',
+  MENSAL: 'MENSAL',
+  ANUAL: 'ANUAL'
+};
+
+export type Recorrencia = (typeof Recorrencia)[keyof typeof Recorrencia]
+
+
+export const TransactionType: {
   INCOME: 'INCOME',
   EXPENSE: 'EXPENSE'
 };
@@ -61,6 +86,14 @@ export namespace $Enums {
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
 
 }
+
+export type AvisoTipo = $Enums.AvisoTipo
+
+export const AvisoTipo: typeof $Enums.AvisoTipo
+
+export type Recorrencia = $Enums.Recorrencia
+
+export const Recorrencia: typeof $Enums.Recorrencia
 
 export type TransactionType = $Enums.TransactionType
 
@@ -213,6 +246,16 @@ export class PrismaClient<
     * ```
     */
   get session(): Prisma.SessionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.aviso`: Exposes CRUD operations for the **Aviso** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Avisos
+    * const avisos = await prisma.aviso.findMany()
+    * ```
+    */
+  get aviso(): Prisma.AvisoDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.transaction`: Exposes CRUD operations for the **Transaction** model.
@@ -697,6 +740,7 @@ export namespace Prisma {
     User: 'User',
     Account: 'Account',
     Session: 'Session',
+    Aviso: 'Aviso',
     Transaction: 'Transaction',
     Goal: 'Goal',
     Limit: 'Limit',
@@ -719,7 +763,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "transaction" | "goal" | "limit" | "creditCard"
+      modelProps: "user" | "account" | "session" | "aviso" | "transaction" | "goal" | "limit" | "creditCard"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -942,6 +986,80 @@ export namespace Prisma {
           count: {
             args: Prisma.SessionCountArgs<ExtArgs>
             result: $Utils.Optional<SessionCountAggregateOutputType> | number
+          }
+        }
+      }
+      Aviso: {
+        payload: Prisma.$AvisoPayload<ExtArgs>
+        fields: Prisma.AvisoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AvisoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AvisoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>
+          }
+          findFirst: {
+            args: Prisma.AvisoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AvisoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>
+          }
+          findMany: {
+            args: Prisma.AvisoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>[]
+          }
+          create: {
+            args: Prisma.AvisoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>
+          }
+          createMany: {
+            args: Prisma.AvisoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AvisoCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>[]
+          }
+          delete: {
+            args: Prisma.AvisoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>
+          }
+          update: {
+            args: Prisma.AvisoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>
+          }
+          deleteMany: {
+            args: Prisma.AvisoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AvisoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AvisoUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>[]
+          }
+          upsert: {
+            args: Prisma.AvisoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AvisoPayload>
+          }
+          aggregate: {
+            args: Prisma.AvisoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAviso>
+          }
+          groupBy: {
+            args: Prisma.AvisoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AvisoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AvisoCountArgs<ExtArgs>
+            result: $Utils.Optional<AvisoCountAggregateOutputType> | number
           }
         }
       }
@@ -1340,6 +1458,7 @@ export namespace Prisma {
     user?: UserOmit
     account?: AccountOmit
     session?: SessionOmit
+    aviso?: AvisoOmit
     transaction?: TransactionOmit
     goal?: GoalOmit
     limit?: LimitOmit
@@ -1429,6 +1548,7 @@ export namespace Prisma {
     transactions: number
     goals: number
     limits: number
+    avisos: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1437,6 +1557,7 @@ export namespace Prisma {
     transactions?: boolean | UserCountOutputTypeCountTransactionsArgs
     goals?: boolean | UserCountOutputTypeCountGoalsArgs
     limits?: boolean | UserCountOutputTypeCountLimitsArgs
+    avisos?: boolean | UserCountOutputTypeCountAvisosArgs
   }
 
   // Custom InputTypes
@@ -1483,6 +1604,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountLimitsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LimitWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAvisosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AvisoWhereInput
   }
 
 
@@ -1660,6 +1788,7 @@ export namespace Prisma {
     goals?: boolean | User$goalsArgs<ExtArgs>
     limits?: boolean | User$limitsArgs<ExtArgs>
     creditCard?: boolean | User$creditCardArgs<ExtArgs>
+    avisos?: boolean | User$avisosArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1695,6 +1824,7 @@ export namespace Prisma {
     goals?: boolean | User$goalsArgs<ExtArgs>
     limits?: boolean | User$limitsArgs<ExtArgs>
     creditCard?: boolean | User$creditCardArgs<ExtArgs>
+    avisos?: boolean | User$avisosArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1709,6 +1839,7 @@ export namespace Prisma {
       goals: Prisma.$GoalPayload<ExtArgs>[]
       limits: Prisma.$LimitPayload<ExtArgs>[]
       creditCard: Prisma.$CreditCardPayload<ExtArgs> | null
+      avisos: Prisma.$AvisoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2116,6 +2247,7 @@ export namespace Prisma {
     goals<T extends User$goalsArgs<ExtArgs> = {}>(args?: Subset<T, User$goalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     limits<T extends User$limitsArgs<ExtArgs> = {}>(args?: Subset<T, User$limitsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LimitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     creditCard<T extends User$creditCardArgs<ExtArgs> = {}>(args?: Subset<T, User$creditCardArgs<ExtArgs>>): Prisma__CreditCardClient<$Result.GetResult<Prisma.$CreditCardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    avisos<T extends User$avisosArgs<ExtArgs> = {}>(args?: Subset<T, User$avisosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2674,6 +2806,30 @@ export namespace Prisma {
      */
     include?: CreditCardInclude<ExtArgs> | null
     where?: CreditCardWhereInput
+  }
+
+  /**
+   * User.avisos
+   */
+  export type User$avisosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    where?: AvisoWhereInput
+    orderBy?: AvisoOrderByWithRelationInput | AvisoOrderByWithRelationInput[]
+    cursor?: AvisoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AvisoScalarFieldEnum | AvisoScalarFieldEnum[]
   }
 
   /**
@@ -4941,6 +5097,1176 @@ export namespace Prisma {
 
 
   /**
+   * Model Aviso
+   */
+
+  export type AggregateAviso = {
+    _count: AvisoCountAggregateOutputType | null
+    _avg: AvisoAvgAggregateOutputType | null
+    _sum: AvisoSumAggregateOutputType | null
+    _min: AvisoMinAggregateOutputType | null
+    _max: AvisoMaxAggregateOutputType | null
+  }
+
+  export type AvisoAvgAggregateOutputType = {
+    valor: number | null
+  }
+
+  export type AvisoSumAggregateOutputType = {
+    valor: number | null
+  }
+
+  export type AvisoMinAggregateOutputType = {
+    id: string | null
+    nome: string | null
+    descricao: string | null
+    valor: number | null
+    data: Date | null
+    tipo: $Enums.AvisoTipo | null
+    recorrencia: $Enums.Recorrencia | null
+    pago: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+  }
+
+  export type AvisoMaxAggregateOutputType = {
+    id: string | null
+    nome: string | null
+    descricao: string | null
+    valor: number | null
+    data: Date | null
+    tipo: $Enums.AvisoTipo | null
+    recorrencia: $Enums.Recorrencia | null
+    pago: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+  }
+
+  export type AvisoCountAggregateOutputType = {
+    id: number
+    nome: number
+    descricao: number
+    valor: number
+    data: number
+    tipo: number
+    recorrencia: number
+    pago: number
+    createdAt: number
+    updatedAt: number
+    userId: number
+    _all: number
+  }
+
+
+  export type AvisoAvgAggregateInputType = {
+    valor?: true
+  }
+
+  export type AvisoSumAggregateInputType = {
+    valor?: true
+  }
+
+  export type AvisoMinAggregateInputType = {
+    id?: true
+    nome?: true
+    descricao?: true
+    valor?: true
+    data?: true
+    tipo?: true
+    recorrencia?: true
+    pago?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+  }
+
+  export type AvisoMaxAggregateInputType = {
+    id?: true
+    nome?: true
+    descricao?: true
+    valor?: true
+    data?: true
+    tipo?: true
+    recorrencia?: true
+    pago?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+  }
+
+  export type AvisoCountAggregateInputType = {
+    id?: true
+    nome?: true
+    descricao?: true
+    valor?: true
+    data?: true
+    tipo?: true
+    recorrencia?: true
+    pago?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    _all?: true
+  }
+
+  export type AvisoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Aviso to aggregate.
+     */
+    where?: AvisoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Avisos to fetch.
+     */
+    orderBy?: AvisoOrderByWithRelationInput | AvisoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AvisoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Avisos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Avisos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Avisos
+    **/
+    _count?: true | AvisoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AvisoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AvisoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AvisoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AvisoMaxAggregateInputType
+  }
+
+  export type GetAvisoAggregateType<T extends AvisoAggregateArgs> = {
+        [P in keyof T & keyof AggregateAviso]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAviso[P]>
+      : GetScalarType<T[P], AggregateAviso[P]>
+  }
+
+
+
+
+  export type AvisoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AvisoWhereInput
+    orderBy?: AvisoOrderByWithAggregationInput | AvisoOrderByWithAggregationInput[]
+    by: AvisoScalarFieldEnum[] | AvisoScalarFieldEnum
+    having?: AvisoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AvisoCountAggregateInputType | true
+    _avg?: AvisoAvgAggregateInputType
+    _sum?: AvisoSumAggregateInputType
+    _min?: AvisoMinAggregateInputType
+    _max?: AvisoMaxAggregateInputType
+  }
+
+  export type AvisoGroupByOutputType = {
+    id: string
+    nome: string
+    descricao: string | null
+    valor: number
+    data: Date
+    tipo: $Enums.AvisoTipo
+    recorrencia: $Enums.Recorrencia
+    pago: boolean
+    createdAt: Date
+    updatedAt: Date
+    userId: string
+    _count: AvisoCountAggregateOutputType | null
+    _avg: AvisoAvgAggregateOutputType | null
+    _sum: AvisoSumAggregateOutputType | null
+    _min: AvisoMinAggregateOutputType | null
+    _max: AvisoMaxAggregateOutputType | null
+  }
+
+  type GetAvisoGroupByPayload<T extends AvisoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AvisoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AvisoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AvisoGroupByOutputType[P]>
+            : GetScalarType<T[P], AvisoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AvisoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nome?: boolean
+    descricao?: boolean
+    valor?: boolean
+    data?: boolean
+    tipo?: boolean
+    recorrencia?: boolean
+    pago?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aviso"]>
+
+  export type AvisoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nome?: boolean
+    descricao?: boolean
+    valor?: boolean
+    data?: boolean
+    tipo?: boolean
+    recorrencia?: boolean
+    pago?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aviso"]>
+
+  export type AvisoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nome?: boolean
+    descricao?: boolean
+    valor?: boolean
+    data?: boolean
+    tipo?: boolean
+    recorrencia?: boolean
+    pago?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aviso"]>
+
+  export type AvisoSelectScalar = {
+    id?: boolean
+    nome?: boolean
+    descricao?: boolean
+    valor?: boolean
+    data?: boolean
+    tipo?: boolean
+    recorrencia?: boolean
+    pago?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+  }
+
+  export type AvisoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nome" | "descricao" | "valor" | "data" | "tipo" | "recorrencia" | "pago" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["aviso"]>
+  export type AvisoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AvisoIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AvisoIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $AvisoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Aviso"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      nome: string
+      descricao: string | null
+      valor: number
+      data: Date
+      tipo: $Enums.AvisoTipo
+      recorrencia: $Enums.Recorrencia
+      pago: boolean
+      createdAt: Date
+      updatedAt: Date
+      userId: string
+    }, ExtArgs["result"]["aviso"]>
+    composites: {}
+  }
+
+  type AvisoGetPayload<S extends boolean | null | undefined | AvisoDefaultArgs> = $Result.GetResult<Prisma.$AvisoPayload, S>
+
+  type AvisoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AvisoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AvisoCountAggregateInputType | true
+    }
+
+  export interface AvisoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Aviso'], meta: { name: 'Aviso' } }
+    /**
+     * Find zero or one Aviso that matches the filter.
+     * @param {AvisoFindUniqueArgs} args - Arguments to find a Aviso
+     * @example
+     * // Get one Aviso
+     * const aviso = await prisma.aviso.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AvisoFindUniqueArgs>(args: SelectSubset<T, AvisoFindUniqueArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Aviso that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AvisoFindUniqueOrThrowArgs} args - Arguments to find a Aviso
+     * @example
+     * // Get one Aviso
+     * const aviso = await prisma.aviso.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AvisoFindUniqueOrThrowArgs>(args: SelectSubset<T, AvisoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Aviso that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoFindFirstArgs} args - Arguments to find a Aviso
+     * @example
+     * // Get one Aviso
+     * const aviso = await prisma.aviso.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AvisoFindFirstArgs>(args?: SelectSubset<T, AvisoFindFirstArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Aviso that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoFindFirstOrThrowArgs} args - Arguments to find a Aviso
+     * @example
+     * // Get one Aviso
+     * const aviso = await prisma.aviso.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AvisoFindFirstOrThrowArgs>(args?: SelectSubset<T, AvisoFindFirstOrThrowArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Avisos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Avisos
+     * const avisos = await prisma.aviso.findMany()
+     * 
+     * // Get first 10 Avisos
+     * const avisos = await prisma.aviso.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const avisoWithIdOnly = await prisma.aviso.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AvisoFindManyArgs>(args?: SelectSubset<T, AvisoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Aviso.
+     * @param {AvisoCreateArgs} args - Arguments to create a Aviso.
+     * @example
+     * // Create one Aviso
+     * const Aviso = await prisma.aviso.create({
+     *   data: {
+     *     // ... data to create a Aviso
+     *   }
+     * })
+     * 
+     */
+    create<T extends AvisoCreateArgs>(args: SelectSubset<T, AvisoCreateArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Avisos.
+     * @param {AvisoCreateManyArgs} args - Arguments to create many Avisos.
+     * @example
+     * // Create many Avisos
+     * const aviso = await prisma.aviso.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AvisoCreateManyArgs>(args?: SelectSubset<T, AvisoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Avisos and returns the data saved in the database.
+     * @param {AvisoCreateManyAndReturnArgs} args - Arguments to create many Avisos.
+     * @example
+     * // Create many Avisos
+     * const aviso = await prisma.aviso.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Avisos and only return the `id`
+     * const avisoWithIdOnly = await prisma.aviso.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AvisoCreateManyAndReturnArgs>(args?: SelectSubset<T, AvisoCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Aviso.
+     * @param {AvisoDeleteArgs} args - Arguments to delete one Aviso.
+     * @example
+     * // Delete one Aviso
+     * const Aviso = await prisma.aviso.delete({
+     *   where: {
+     *     // ... filter to delete one Aviso
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AvisoDeleteArgs>(args: SelectSubset<T, AvisoDeleteArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Aviso.
+     * @param {AvisoUpdateArgs} args - Arguments to update one Aviso.
+     * @example
+     * // Update one Aviso
+     * const aviso = await prisma.aviso.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AvisoUpdateArgs>(args: SelectSubset<T, AvisoUpdateArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Avisos.
+     * @param {AvisoDeleteManyArgs} args - Arguments to filter Avisos to delete.
+     * @example
+     * // Delete a few Avisos
+     * const { count } = await prisma.aviso.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AvisoDeleteManyArgs>(args?: SelectSubset<T, AvisoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Avisos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Avisos
+     * const aviso = await prisma.aviso.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AvisoUpdateManyArgs>(args: SelectSubset<T, AvisoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Avisos and returns the data updated in the database.
+     * @param {AvisoUpdateManyAndReturnArgs} args - Arguments to update many Avisos.
+     * @example
+     * // Update many Avisos
+     * const aviso = await prisma.aviso.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Avisos and only return the `id`
+     * const avisoWithIdOnly = await prisma.aviso.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AvisoUpdateManyAndReturnArgs>(args: SelectSubset<T, AvisoUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Aviso.
+     * @param {AvisoUpsertArgs} args - Arguments to update or create a Aviso.
+     * @example
+     * // Update or create a Aviso
+     * const aviso = await prisma.aviso.upsert({
+     *   create: {
+     *     // ... data to create a Aviso
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Aviso we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AvisoUpsertArgs>(args: SelectSubset<T, AvisoUpsertArgs<ExtArgs>>): Prisma__AvisoClient<$Result.GetResult<Prisma.$AvisoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Avisos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoCountArgs} args - Arguments to filter Avisos to count.
+     * @example
+     * // Count the number of Avisos
+     * const count = await prisma.aviso.count({
+     *   where: {
+     *     // ... the filter for the Avisos we want to count
+     *   }
+     * })
+    **/
+    count<T extends AvisoCountArgs>(
+      args?: Subset<T, AvisoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AvisoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Aviso.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AvisoAggregateArgs>(args: Subset<T, AvisoAggregateArgs>): Prisma.PrismaPromise<GetAvisoAggregateType<T>>
+
+    /**
+     * Group by Aviso.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AvisoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AvisoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AvisoGroupByArgs['orderBy'] }
+        : { orderBy?: AvisoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AvisoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAvisoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Aviso model
+   */
+  readonly fields: AvisoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Aviso.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AvisoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Aviso model
+   */
+  interface AvisoFieldRefs {
+    readonly id: FieldRef<"Aviso", 'String'>
+    readonly nome: FieldRef<"Aviso", 'String'>
+    readonly descricao: FieldRef<"Aviso", 'String'>
+    readonly valor: FieldRef<"Aviso", 'Float'>
+    readonly data: FieldRef<"Aviso", 'DateTime'>
+    readonly tipo: FieldRef<"Aviso", 'AvisoTipo'>
+    readonly recorrencia: FieldRef<"Aviso", 'Recorrencia'>
+    readonly pago: FieldRef<"Aviso", 'Boolean'>
+    readonly createdAt: FieldRef<"Aviso", 'DateTime'>
+    readonly updatedAt: FieldRef<"Aviso", 'DateTime'>
+    readonly userId: FieldRef<"Aviso", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Aviso findUnique
+   */
+  export type AvisoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * Filter, which Aviso to fetch.
+     */
+    where: AvisoWhereUniqueInput
+  }
+
+  /**
+   * Aviso findUniqueOrThrow
+   */
+  export type AvisoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * Filter, which Aviso to fetch.
+     */
+    where: AvisoWhereUniqueInput
+  }
+
+  /**
+   * Aviso findFirst
+   */
+  export type AvisoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * Filter, which Aviso to fetch.
+     */
+    where?: AvisoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Avisos to fetch.
+     */
+    orderBy?: AvisoOrderByWithRelationInput | AvisoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Avisos.
+     */
+    cursor?: AvisoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Avisos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Avisos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Avisos.
+     */
+    distinct?: AvisoScalarFieldEnum | AvisoScalarFieldEnum[]
+  }
+
+  /**
+   * Aviso findFirstOrThrow
+   */
+  export type AvisoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * Filter, which Aviso to fetch.
+     */
+    where?: AvisoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Avisos to fetch.
+     */
+    orderBy?: AvisoOrderByWithRelationInput | AvisoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Avisos.
+     */
+    cursor?: AvisoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Avisos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Avisos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Avisos.
+     */
+    distinct?: AvisoScalarFieldEnum | AvisoScalarFieldEnum[]
+  }
+
+  /**
+   * Aviso findMany
+   */
+  export type AvisoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * Filter, which Avisos to fetch.
+     */
+    where?: AvisoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Avisos to fetch.
+     */
+    orderBy?: AvisoOrderByWithRelationInput | AvisoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Avisos.
+     */
+    cursor?: AvisoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Avisos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Avisos.
+     */
+    skip?: number
+    distinct?: AvisoScalarFieldEnum | AvisoScalarFieldEnum[]
+  }
+
+  /**
+   * Aviso create
+   */
+  export type AvisoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Aviso.
+     */
+    data: XOR<AvisoCreateInput, AvisoUncheckedCreateInput>
+  }
+
+  /**
+   * Aviso createMany
+   */
+  export type AvisoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Avisos.
+     */
+    data: AvisoCreateManyInput | AvisoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Aviso createManyAndReturn
+   */
+  export type AvisoCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * The data used to create many Avisos.
+     */
+    data: AvisoCreateManyInput | AvisoCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Aviso update
+   */
+  export type AvisoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Aviso.
+     */
+    data: XOR<AvisoUpdateInput, AvisoUncheckedUpdateInput>
+    /**
+     * Choose, which Aviso to update.
+     */
+    where: AvisoWhereUniqueInput
+  }
+
+  /**
+   * Aviso updateMany
+   */
+  export type AvisoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Avisos.
+     */
+    data: XOR<AvisoUpdateManyMutationInput, AvisoUncheckedUpdateManyInput>
+    /**
+     * Filter which Avisos to update
+     */
+    where?: AvisoWhereInput
+    /**
+     * Limit how many Avisos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Aviso updateManyAndReturn
+   */
+  export type AvisoUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * The data used to update Avisos.
+     */
+    data: XOR<AvisoUpdateManyMutationInput, AvisoUncheckedUpdateManyInput>
+    /**
+     * Filter which Avisos to update
+     */
+    where?: AvisoWhereInput
+    /**
+     * Limit how many Avisos to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Aviso upsert
+   */
+  export type AvisoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Aviso to update in case it exists.
+     */
+    where: AvisoWhereUniqueInput
+    /**
+     * In case the Aviso found by the `where` argument doesn't exist, create a new Aviso with this data.
+     */
+    create: XOR<AvisoCreateInput, AvisoUncheckedCreateInput>
+    /**
+     * In case the Aviso was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AvisoUpdateInput, AvisoUncheckedUpdateInput>
+  }
+
+  /**
+   * Aviso delete
+   */
+  export type AvisoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+    /**
+     * Filter which Aviso to delete.
+     */
+    where: AvisoWhereUniqueInput
+  }
+
+  /**
+   * Aviso deleteMany
+   */
+  export type AvisoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Avisos to delete
+     */
+    where?: AvisoWhereInput
+    /**
+     * Limit how many Avisos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Aviso without action
+   */
+  export type AvisoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Aviso
+     */
+    select?: AvisoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Aviso
+     */
+    omit?: AvisoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AvisoInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Transaction
    */
 
@@ -4965,6 +6291,7 @@ export namespace Prisma {
     title: string | null
     description: string | null
     value: number | null
+    color: string | null
     type: $Enums.TransactionType | null
     createdAt: Date | null
     userId: string | null
@@ -4975,6 +6302,7 @@ export namespace Prisma {
     title: string | null
     description: string | null
     value: number | null
+    color: string | null
     type: $Enums.TransactionType | null
     createdAt: Date | null
     userId: string | null
@@ -4985,6 +6313,7 @@ export namespace Prisma {
     title: number
     description: number
     value: number
+    color: number
     type: number
     createdAt: number
     userId: number
@@ -5005,6 +6334,7 @@ export namespace Prisma {
     title?: true
     description?: true
     value?: true
+    color?: true
     type?: true
     createdAt?: true
     userId?: true
@@ -5015,6 +6345,7 @@ export namespace Prisma {
     title?: true
     description?: true
     value?: true
+    color?: true
     type?: true
     createdAt?: true
     userId?: true
@@ -5025,6 +6356,7 @@ export namespace Prisma {
     title?: true
     description?: true
     value?: true
+    color?: true
     type?: true
     createdAt?: true
     userId?: true
@@ -5122,6 +6454,7 @@ export namespace Prisma {
     title: string
     description: string | null
     value: number
+    color: string
     type: $Enums.TransactionType
     createdAt: Date
     userId: string
@@ -5151,6 +6484,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     value?: boolean
+    color?: boolean
     type?: boolean
     createdAt?: boolean
     userId?: boolean
@@ -5162,6 +6496,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     value?: boolean
+    color?: boolean
     type?: boolean
     createdAt?: boolean
     userId?: boolean
@@ -5173,6 +6508,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     value?: boolean
+    color?: boolean
     type?: boolean
     createdAt?: boolean
     userId?: boolean
@@ -5184,12 +6520,13 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     value?: boolean
+    color?: boolean
     type?: boolean
     createdAt?: boolean
     userId?: boolean
   }
 
-  export type TransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "value" | "type" | "createdAt" | "userId", ExtArgs["result"]["transaction"]>
+  export type TransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "value" | "color" | "type" | "createdAt" | "userId", ExtArgs["result"]["transaction"]>
   export type TransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -5210,6 +6547,7 @@ export namespace Prisma {
       title: string
       description: string | null
       value: number
+      color: string
       type: $Enums.TransactionType
       createdAt: Date
       userId: string
@@ -5641,6 +6979,7 @@ export namespace Prisma {
     readonly title: FieldRef<"Transaction", 'String'>
     readonly description: FieldRef<"Transaction", 'String'>
     readonly value: FieldRef<"Transaction", 'Float'>
+    readonly color: FieldRef<"Transaction", 'String'>
     readonly type: FieldRef<"Transaction", 'TransactionType'>
     readonly createdAt: FieldRef<"Transaction", 'DateTime'>
     readonly userId: FieldRef<"Transaction", 'String'>
@@ -6086,6 +7425,7 @@ export namespace Prisma {
     targetAmount: number | null
     currentAmount: number | null
     deadline: Date | null
+    color: string | null
     createdAt: Date | null
     updatedAt: Date | null
     userId: string | null
@@ -6097,6 +7437,7 @@ export namespace Prisma {
     targetAmount: number | null
     currentAmount: number | null
     deadline: Date | null
+    color: string | null
     createdAt: Date | null
     updatedAt: Date | null
     userId: string | null
@@ -6108,6 +7449,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount: number
     deadline: number
+    color: number
     createdAt: number
     updatedAt: number
     userId: number
@@ -6131,6 +7473,7 @@ export namespace Prisma {
     targetAmount?: true
     currentAmount?: true
     deadline?: true
+    color?: true
     createdAt?: true
     updatedAt?: true
     userId?: true
@@ -6142,6 +7485,7 @@ export namespace Prisma {
     targetAmount?: true
     currentAmount?: true
     deadline?: true
+    color?: true
     createdAt?: true
     updatedAt?: true
     userId?: true
@@ -6153,6 +7497,7 @@ export namespace Prisma {
     targetAmount?: true
     currentAmount?: true
     deadline?: true
+    color?: true
     createdAt?: true
     updatedAt?: true
     userId?: true
@@ -6251,6 +7596,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount: number
     deadline: Date | null
+    color: string
     createdAt: Date
     updatedAt: Date
     userId: string
@@ -6281,6 +7627,7 @@ export namespace Prisma {
     targetAmount?: boolean
     currentAmount?: boolean
     deadline?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
@@ -6293,6 +7640,7 @@ export namespace Prisma {
     targetAmount?: boolean
     currentAmount?: boolean
     deadline?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
@@ -6305,6 +7653,7 @@ export namespace Prisma {
     targetAmount?: boolean
     currentAmount?: boolean
     deadline?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
@@ -6317,12 +7666,13 @@ export namespace Prisma {
     targetAmount?: boolean
     currentAmount?: boolean
     deadline?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
   }
 
-  export type GoalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "targetAmount" | "currentAmount" | "deadline" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["goal"]>
+  export type GoalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "targetAmount" | "currentAmount" | "deadline" | "color" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["goal"]>
   export type GoalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6344,6 +7694,7 @@ export namespace Prisma {
       targetAmount: number
       currentAmount: number
       deadline: Date | null
+      color: string
       createdAt: Date
       updatedAt: Date
       userId: string
@@ -6776,6 +8127,7 @@ export namespace Prisma {
     readonly targetAmount: FieldRef<"Goal", 'Float'>
     readonly currentAmount: FieldRef<"Goal", 'Float'>
     readonly deadline: FieldRef<"Goal", 'DateTime'>
+    readonly color: FieldRef<"Goal", 'String'>
     readonly createdAt: FieldRef<"Goal", 'DateTime'>
     readonly updatedAt: FieldRef<"Goal", 'DateTime'>
     readonly userId: FieldRef<"Goal", 'String'>
@@ -7220,6 +8572,7 @@ export namespace Prisma {
     title: string | null
     limitAmount: number | null
     currentSpent: number | null
+    color: string | null
     createdAt: Date | null
     userId: string | null
   }
@@ -7229,6 +8582,7 @@ export namespace Prisma {
     title: string | null
     limitAmount: number | null
     currentSpent: number | null
+    color: string | null
     createdAt: Date | null
     userId: string | null
   }
@@ -7238,6 +8592,7 @@ export namespace Prisma {
     title: number
     limitAmount: number
     currentSpent: number
+    color: number
     createdAt: number
     userId: number
     _all: number
@@ -7259,6 +8614,7 @@ export namespace Prisma {
     title?: true
     limitAmount?: true
     currentSpent?: true
+    color?: true
     createdAt?: true
     userId?: true
   }
@@ -7268,6 +8624,7 @@ export namespace Prisma {
     title?: true
     limitAmount?: true
     currentSpent?: true
+    color?: true
     createdAt?: true
     userId?: true
   }
@@ -7277,6 +8634,7 @@ export namespace Prisma {
     title?: true
     limitAmount?: true
     currentSpent?: true
+    color?: true
     createdAt?: true
     userId?: true
     _all?: true
@@ -7373,6 +8731,7 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent: number
+    color: string
     createdAt: Date
     userId: string
     _count: LimitCountAggregateOutputType | null
@@ -7401,6 +8760,7 @@ export namespace Prisma {
     title?: boolean
     limitAmount?: boolean
     currentSpent?: boolean
+    color?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7411,6 +8771,7 @@ export namespace Prisma {
     title?: boolean
     limitAmount?: boolean
     currentSpent?: boolean
+    color?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7421,6 +8782,7 @@ export namespace Prisma {
     title?: boolean
     limitAmount?: boolean
     currentSpent?: boolean
+    color?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7431,11 +8793,12 @@ export namespace Prisma {
     title?: boolean
     limitAmount?: boolean
     currentSpent?: boolean
+    color?: boolean
     createdAt?: boolean
     userId?: boolean
   }
 
-  export type LimitOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "limitAmount" | "currentSpent" | "createdAt" | "userId", ExtArgs["result"]["limit"]>
+  export type LimitOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "limitAmount" | "currentSpent" | "color" | "createdAt" | "userId", ExtArgs["result"]["limit"]>
   export type LimitInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -7456,6 +8819,7 @@ export namespace Prisma {
       title: string
       limitAmount: number
       currentSpent: number
+      color: string
       createdAt: Date
       userId: string
     }, ExtArgs["result"]["limit"]>
@@ -7886,6 +9250,7 @@ export namespace Prisma {
     readonly title: FieldRef<"Limit", 'String'>
     readonly limitAmount: FieldRef<"Limit", 'Float'>
     readonly currentSpent: FieldRef<"Limit", 'Float'>
+    readonly color: FieldRef<"Limit", 'String'>
     readonly createdAt: FieldRef<"Limit", 'DateTime'>
     readonly userId: FieldRef<"Limit", 'String'>
   }
@@ -9452,11 +10817,29 @@ export namespace Prisma {
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
+  export const AvisoScalarFieldEnum: {
+    id: 'id',
+    nome: 'nome',
+    descricao: 'descricao',
+    valor: 'valor',
+    data: 'data',
+    tipo: 'tipo',
+    recorrencia: 'recorrencia',
+    pago: 'pago',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    userId: 'userId'
+  };
+
+  export type AvisoScalarFieldEnum = (typeof AvisoScalarFieldEnum)[keyof typeof AvisoScalarFieldEnum]
+
+
   export const TransactionScalarFieldEnum: {
     id: 'id',
     title: 'title',
     description: 'description',
     value: 'value',
+    color: 'color',
     type: 'type',
     createdAt: 'createdAt',
     userId: 'userId'
@@ -9471,6 +10854,7 @@ export namespace Prisma {
     targetAmount: 'targetAmount',
     currentAmount: 'currentAmount',
     deadline: 'deadline',
+    color: 'color',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     userId: 'userId'
@@ -9484,6 +10868,7 @@ export namespace Prisma {
     title: 'title',
     limitAmount: 'limitAmount',
     currentSpent: 'currentSpent',
+    color: 'color',
     createdAt: 'createdAt',
     userId: 'userId'
   };
@@ -9588,6 +10973,41 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'AvisoTipo'
+   */
+  export type EnumAvisoTipoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AvisoTipo'>
+    
+
+
+  /**
+   * Reference to a field of type 'AvisoTipo[]'
+   */
+  export type ListEnumAvisoTipoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AvisoTipo[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Recorrencia'
+   */
+  export type EnumRecorrenciaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Recorrencia'>
+    
+
+
+  /**
+   * Reference to a field of type 'Recorrencia[]'
+   */
+  export type ListEnumRecorrenciaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Recorrencia[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'TransactionType'
    */
   export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
@@ -9619,6 +11039,7 @@ export namespace Prisma {
     goals?: GoalListRelationFilter
     limits?: LimitListRelationFilter
     creditCard?: XOR<CreditCardNullableScalarRelationFilter, CreditCardWhereInput> | null
+    avisos?: AvisoListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -9633,6 +11054,7 @@ export namespace Prisma {
     goals?: GoalOrderByRelationAggregateInput
     limits?: LimitOrderByRelationAggregateInput
     creditCard?: CreditCardOrderByWithRelationInput
+    avisos?: AvisoOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -9650,6 +11072,7 @@ export namespace Prisma {
     goals?: GoalListRelationFilter
     limits?: LimitListRelationFilter
     creditCard?: XOR<CreditCardNullableScalarRelationFilter, CreditCardWhereInput> | null
+    avisos?: AvisoListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -9822,6 +11245,93 @@ export namespace Prisma {
     expires?: DateTimeWithAggregatesFilter<"Session"> | Date | string
   }
 
+  export type AvisoWhereInput = {
+    AND?: AvisoWhereInput | AvisoWhereInput[]
+    OR?: AvisoWhereInput[]
+    NOT?: AvisoWhereInput | AvisoWhereInput[]
+    id?: StringFilter<"Aviso"> | string
+    nome?: StringFilter<"Aviso"> | string
+    descricao?: StringNullableFilter<"Aviso"> | string | null
+    valor?: FloatFilter<"Aviso"> | number
+    data?: DateTimeFilter<"Aviso"> | Date | string
+    tipo?: EnumAvisoTipoFilter<"Aviso"> | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFilter<"Aviso"> | $Enums.Recorrencia
+    pago?: BoolFilter<"Aviso"> | boolean
+    createdAt?: DateTimeFilter<"Aviso"> | Date | string
+    updatedAt?: DateTimeFilter<"Aviso"> | Date | string
+    userId?: StringFilter<"Aviso"> | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type AvisoOrderByWithRelationInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    descricao?: SortOrderInput | SortOrder
+    valor?: SortOrder
+    data?: SortOrder
+    tipo?: SortOrder
+    recorrencia?: SortOrder
+    pago?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type AvisoWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AvisoWhereInput | AvisoWhereInput[]
+    OR?: AvisoWhereInput[]
+    NOT?: AvisoWhereInput | AvisoWhereInput[]
+    nome?: StringFilter<"Aviso"> | string
+    descricao?: StringNullableFilter<"Aviso"> | string | null
+    valor?: FloatFilter<"Aviso"> | number
+    data?: DateTimeFilter<"Aviso"> | Date | string
+    tipo?: EnumAvisoTipoFilter<"Aviso"> | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFilter<"Aviso"> | $Enums.Recorrencia
+    pago?: BoolFilter<"Aviso"> | boolean
+    createdAt?: DateTimeFilter<"Aviso"> | Date | string
+    updatedAt?: DateTimeFilter<"Aviso"> | Date | string
+    userId?: StringFilter<"Aviso"> | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type AvisoOrderByWithAggregationInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    descricao?: SortOrderInput | SortOrder
+    valor?: SortOrder
+    data?: SortOrder
+    tipo?: SortOrder
+    recorrencia?: SortOrder
+    pago?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    _count?: AvisoCountOrderByAggregateInput
+    _avg?: AvisoAvgOrderByAggregateInput
+    _max?: AvisoMaxOrderByAggregateInput
+    _min?: AvisoMinOrderByAggregateInput
+    _sum?: AvisoSumOrderByAggregateInput
+  }
+
+  export type AvisoScalarWhereWithAggregatesInput = {
+    AND?: AvisoScalarWhereWithAggregatesInput | AvisoScalarWhereWithAggregatesInput[]
+    OR?: AvisoScalarWhereWithAggregatesInput[]
+    NOT?: AvisoScalarWhereWithAggregatesInput | AvisoScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Aviso"> | string
+    nome?: StringWithAggregatesFilter<"Aviso"> | string
+    descricao?: StringNullableWithAggregatesFilter<"Aviso"> | string | null
+    valor?: FloatWithAggregatesFilter<"Aviso"> | number
+    data?: DateTimeWithAggregatesFilter<"Aviso"> | Date | string
+    tipo?: EnumAvisoTipoWithAggregatesFilter<"Aviso"> | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaWithAggregatesFilter<"Aviso"> | $Enums.Recorrencia
+    pago?: BoolWithAggregatesFilter<"Aviso"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Aviso"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Aviso"> | Date | string
+    userId?: StringWithAggregatesFilter<"Aviso"> | string
+  }
+
   export type TransactionWhereInput = {
     AND?: TransactionWhereInput | TransactionWhereInput[]
     OR?: TransactionWhereInput[]
@@ -9830,6 +11340,7 @@ export namespace Prisma {
     title?: StringFilter<"Transaction"> | string
     description?: StringNullableFilter<"Transaction"> | string | null
     value?: FloatFilter<"Transaction"> | number
+    color?: StringFilter<"Transaction"> | string
     type?: EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     userId?: StringFilter<"Transaction"> | string
@@ -9841,6 +11352,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     value?: SortOrder
+    color?: SortOrder
     type?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
@@ -9855,6 +11367,7 @@ export namespace Prisma {
     title?: StringFilter<"Transaction"> | string
     description?: StringNullableFilter<"Transaction"> | string | null
     value?: FloatFilter<"Transaction"> | number
+    color?: StringFilter<"Transaction"> | string
     type?: EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     userId?: StringFilter<"Transaction"> | string
@@ -9866,6 +11379,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     value?: SortOrder
+    color?: SortOrder
     type?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
@@ -9884,6 +11398,7 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"Transaction"> | string
     description?: StringNullableWithAggregatesFilter<"Transaction"> | string | null
     value?: FloatWithAggregatesFilter<"Transaction"> | number
+    color?: StringWithAggregatesFilter<"Transaction"> | string
     type?: EnumTransactionTypeWithAggregatesFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeWithAggregatesFilter<"Transaction"> | Date | string
     userId?: StringWithAggregatesFilter<"Transaction"> | string
@@ -9898,6 +11413,7 @@ export namespace Prisma {
     targetAmount?: FloatFilter<"Goal"> | number
     currentAmount?: FloatFilter<"Goal"> | number
     deadline?: DateTimeNullableFilter<"Goal"> | Date | string | null
+    color?: StringFilter<"Goal"> | string
     createdAt?: DateTimeFilter<"Goal"> | Date | string
     updatedAt?: DateTimeFilter<"Goal"> | Date | string
     userId?: StringFilter<"Goal"> | string
@@ -9910,6 +11426,7 @@ export namespace Prisma {
     targetAmount?: SortOrder
     currentAmount?: SortOrder
     deadline?: SortOrderInput | SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
@@ -9925,6 +11442,7 @@ export namespace Prisma {
     targetAmount?: FloatFilter<"Goal"> | number
     currentAmount?: FloatFilter<"Goal"> | number
     deadline?: DateTimeNullableFilter<"Goal"> | Date | string | null
+    color?: StringFilter<"Goal"> | string
     createdAt?: DateTimeFilter<"Goal"> | Date | string
     updatedAt?: DateTimeFilter<"Goal"> | Date | string
     userId?: StringFilter<"Goal"> | string
@@ -9937,6 +11455,7 @@ export namespace Prisma {
     targetAmount?: SortOrder
     currentAmount?: SortOrder
     deadline?: SortOrderInput | SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
@@ -9956,6 +11475,7 @@ export namespace Prisma {
     targetAmount?: FloatWithAggregatesFilter<"Goal"> | number
     currentAmount?: FloatWithAggregatesFilter<"Goal"> | number
     deadline?: DateTimeNullableWithAggregatesFilter<"Goal"> | Date | string | null
+    color?: StringWithAggregatesFilter<"Goal"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Goal"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Goal"> | Date | string
     userId?: StringWithAggregatesFilter<"Goal"> | string
@@ -9969,6 +11489,7 @@ export namespace Prisma {
     title?: StringFilter<"Limit"> | string
     limitAmount?: FloatFilter<"Limit"> | number
     currentSpent?: FloatFilter<"Limit"> | number
+    color?: StringFilter<"Limit"> | string
     createdAt?: DateTimeFilter<"Limit"> | Date | string
     userId?: StringFilter<"Limit"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -9979,6 +11500,7 @@ export namespace Prisma {
     title?: SortOrder
     limitAmount?: SortOrder
     currentSpent?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -9992,6 +11514,7 @@ export namespace Prisma {
     title?: StringFilter<"Limit"> | string
     limitAmount?: FloatFilter<"Limit"> | number
     currentSpent?: FloatFilter<"Limit"> | number
+    color?: StringFilter<"Limit"> | string
     createdAt?: DateTimeFilter<"Limit"> | Date | string
     userId?: StringFilter<"Limit"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -10002,6 +11525,7 @@ export namespace Prisma {
     title?: SortOrder
     limitAmount?: SortOrder
     currentSpent?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
     _count?: LimitCountOrderByAggregateInput
@@ -10019,6 +11543,7 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"Limit"> | string
     limitAmount?: FloatWithAggregatesFilter<"Limit"> | number
     currentSpent?: FloatWithAggregatesFilter<"Limit"> | number
+    color?: StringWithAggregatesFilter<"Limit"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Limit"> | Date | string
     userId?: StringWithAggregatesFilter<"Limit"> | string
   }
@@ -10092,6 +11617,7 @@ export namespace Prisma {
     goals?: GoalCreateNestedManyWithoutUserInput
     limits?: LimitCreateNestedManyWithoutUserInput
     creditCard?: CreditCardCreateNestedOneWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -10106,6 +11632,7 @@ export namespace Prisma {
     goals?: GoalUncheckedCreateNestedManyWithoutUserInput
     limits?: LimitUncheckedCreateNestedManyWithoutUserInput
     creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -10120,6 +11647,7 @@ export namespace Prisma {
     goals?: GoalUpdateManyWithoutUserNestedInput
     limits?: LimitUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -10134,6 +11662,7 @@ export namespace Prisma {
     goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
     limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -10319,11 +11848,109 @@ export namespace Prisma {
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AvisoCreateInput = {
+    id?: string
+    nome: string
+    descricao?: string | null
+    valor?: number
+    data: Date | string
+    tipo?: $Enums.AvisoTipo
+    recorrencia?: $Enums.Recorrencia
+    pago?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAvisosInput
+  }
+
+  export type AvisoUncheckedCreateInput = {
+    id?: string
+    nome: string
+    descricao?: string | null
+    valor?: number
+    data: Date | string
+    tipo?: $Enums.AvisoTipo
+    recorrencia?: $Enums.Recorrencia
+    pago?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type AvisoUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAvisosNestedInput
+  }
+
+  export type AvisoUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AvisoCreateManyInput = {
+    id?: string
+    nome: string
+    descricao?: string | null
+    valor?: number
+    data: Date | string
+    tipo?: $Enums.AvisoTipo
+    recorrencia?: $Enums.Recorrencia
+    pago?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type AvisoUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AvisoUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type TransactionCreateInput = {
     id?: string
     title: string
     description?: string | null
     value: number
+    color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutTransactionsInput
@@ -10334,6 +11961,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     value: number
+    color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
     userId: string
@@ -10344,6 +11972,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutTransactionsNestedInput
@@ -10354,6 +11983,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -10364,6 +11994,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     value: number
+    color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
     userId: string
@@ -10374,6 +12005,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10383,6 +12015,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -10394,6 +12027,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount?: number
     deadline?: Date | string | null
+    color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutGoalsInput
@@ -10405,6 +12039,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount?: number
     deadline?: Date | string | null
+    color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
@@ -10416,6 +12051,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutGoalsNestedInput
@@ -10427,6 +12063,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -10438,6 +12075,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount?: number
     deadline?: Date | string | null
+    color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
@@ -10449,6 +12087,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10459,6 +12098,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -10469,6 +12109,7 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent?: number
+    color?: string
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutLimitsInput
   }
@@ -10478,6 +12119,7 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent?: number
+    color?: string
     createdAt?: Date | string
     userId: string
   }
@@ -10487,6 +12129,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutLimitsNestedInput
   }
@@ -10496,6 +12139,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
@@ -10505,6 +12149,7 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent?: number
+    color?: string
     createdAt?: Date | string
     userId: string
   }
@@ -10514,6 +12159,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -10522,6 +12168,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
@@ -10657,6 +12304,12 @@ export namespace Prisma {
     isNot?: CreditCardWhereInput | null
   }
 
+  export type AvisoListRelationFilter = {
+    every?: AvisoWhereInput
+    some?: AvisoWhereInput
+    none?: AvisoWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -10679,6 +12332,10 @@ export namespace Prisma {
   }
 
   export type LimitOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AvisoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10908,49 +12565,73 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
-  export type EnumTransactionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
+  export type EnumAvisoTipoFilter<$PrismaModel = never> = {
+    equals?: $Enums.AvisoTipo | EnumAvisoTipoFieldRefInput<$PrismaModel>
+    in?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    not?: NestedEnumAvisoTipoFilter<$PrismaModel> | $Enums.AvisoTipo
   }
 
-  export type TransactionCountOrderByAggregateInput = {
+  export type EnumRecorrenciaFilter<$PrismaModel = never> = {
+    equals?: $Enums.Recorrencia | EnumRecorrenciaFieldRefInput<$PrismaModel>
+    in?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecorrenciaFilter<$PrismaModel> | $Enums.Recorrencia
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type AvisoCountOrderByAggregateInput = {
     id?: SortOrder
-    title?: SortOrder
-    description?: SortOrder
-    value?: SortOrder
-    type?: SortOrder
+    nome?: SortOrder
+    descricao?: SortOrder
+    valor?: SortOrder
+    data?: SortOrder
+    tipo?: SortOrder
+    recorrencia?: SortOrder
+    pago?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userId?: SortOrder
   }
 
-  export type TransactionAvgOrderByAggregateInput = {
-    value?: SortOrder
+  export type AvisoAvgOrderByAggregateInput = {
+    valor?: SortOrder
   }
 
-  export type TransactionMaxOrderByAggregateInput = {
+  export type AvisoMaxOrderByAggregateInput = {
     id?: SortOrder
-    title?: SortOrder
-    description?: SortOrder
-    value?: SortOrder
-    type?: SortOrder
+    nome?: SortOrder
+    descricao?: SortOrder
+    valor?: SortOrder
+    data?: SortOrder
+    tipo?: SortOrder
+    recorrencia?: SortOrder
+    pago?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userId?: SortOrder
   }
 
-  export type TransactionMinOrderByAggregateInput = {
+  export type AvisoMinOrderByAggregateInput = {
     id?: SortOrder
-    title?: SortOrder
-    description?: SortOrder
-    value?: SortOrder
-    type?: SortOrder
+    nome?: SortOrder
+    descricao?: SortOrder
+    valor?: SortOrder
+    data?: SortOrder
+    tipo?: SortOrder
+    recorrencia?: SortOrder
+    pago?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userId?: SortOrder
   }
 
-  export type TransactionSumOrderByAggregateInput = {
-    value?: SortOrder
+  export type AvisoSumOrderByAggregateInput = {
+    valor?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -10969,6 +12650,82 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type EnumAvisoTipoWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AvisoTipo | EnumAvisoTipoFieldRefInput<$PrismaModel>
+    in?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    not?: NestedEnumAvisoTipoWithAggregatesFilter<$PrismaModel> | $Enums.AvisoTipo
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAvisoTipoFilter<$PrismaModel>
+    _max?: NestedEnumAvisoTipoFilter<$PrismaModel>
+  }
+
+  export type EnumRecorrenciaWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Recorrencia | EnumRecorrenciaFieldRefInput<$PrismaModel>
+    in?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecorrenciaWithAggregatesFilter<$PrismaModel> | $Enums.Recorrencia
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRecorrenciaFilter<$PrismaModel>
+    _max?: NestedEnumRecorrenciaFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type EnumTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
+  }
+
+  export type TransactionCountOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    value?: SortOrder
+    color?: SortOrder
+    type?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type TransactionAvgOrderByAggregateInput = {
+    value?: SortOrder
+  }
+
+  export type TransactionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    value?: SortOrder
+    color?: SortOrder
+    type?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type TransactionMinOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    value?: SortOrder
+    color?: SortOrder
+    type?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type TransactionSumOrderByAggregateInput = {
+    value?: SortOrder
+  }
+
   export type EnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
     in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
@@ -10985,6 +12742,7 @@ export namespace Prisma {
     targetAmount?: SortOrder
     currentAmount?: SortOrder
     deadline?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
@@ -11001,6 +12759,7 @@ export namespace Prisma {
     targetAmount?: SortOrder
     currentAmount?: SortOrder
     deadline?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
@@ -11012,6 +12771,7 @@ export namespace Prisma {
     targetAmount?: SortOrder
     currentAmount?: SortOrder
     deadline?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
@@ -11027,6 +12787,7 @@ export namespace Prisma {
     title?: SortOrder
     limitAmount?: SortOrder
     currentSpent?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11041,6 +12802,7 @@ export namespace Prisma {
     title?: SortOrder
     limitAmount?: SortOrder
     currentSpent?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11050,6 +12812,7 @@ export namespace Prisma {
     title?: SortOrder
     limitAmount?: SortOrder
     currentSpent?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11134,6 +12897,13 @@ export namespace Prisma {
     connect?: CreditCardWhereUniqueInput
   }
 
+  export type AvisoCreateNestedManyWithoutUserInput = {
+    create?: XOR<AvisoCreateWithoutUserInput, AvisoUncheckedCreateWithoutUserInput> | AvisoCreateWithoutUserInput[] | AvisoUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AvisoCreateOrConnectWithoutUserInput | AvisoCreateOrConnectWithoutUserInput[]
+    createMany?: AvisoCreateManyUserInputEnvelope
+    connect?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -11173,6 +12943,13 @@ export namespace Prisma {
     create?: XOR<CreditCardCreateWithoutUserInput, CreditCardUncheckedCreateWithoutUserInput>
     connectOrCreate?: CreditCardCreateOrConnectWithoutUserInput
     connect?: CreditCardWhereUniqueInput
+  }
+
+  export type AvisoUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AvisoCreateWithoutUserInput, AvisoUncheckedCreateWithoutUserInput> | AvisoCreateWithoutUserInput[] | AvisoUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AvisoCreateOrConnectWithoutUserInput | AvisoCreateOrConnectWithoutUserInput[]
+    createMany?: AvisoCreateManyUserInputEnvelope
+    connect?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -11267,6 +13044,20 @@ export namespace Prisma {
     update?: XOR<XOR<CreditCardUpdateToOneWithWhereWithoutUserInput, CreditCardUpdateWithoutUserInput>, CreditCardUncheckedUpdateWithoutUserInput>
   }
 
+  export type AvisoUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AvisoCreateWithoutUserInput, AvisoUncheckedCreateWithoutUserInput> | AvisoCreateWithoutUserInput[] | AvisoUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AvisoCreateOrConnectWithoutUserInput | AvisoCreateOrConnectWithoutUserInput[]
+    upsert?: AvisoUpsertWithWhereUniqueWithoutUserInput | AvisoUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AvisoCreateManyUserInputEnvelope
+    set?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    disconnect?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    delete?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    connect?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    update?: AvisoUpdateWithWhereUniqueWithoutUserInput | AvisoUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AvisoUpdateManyWithWhereWithoutUserInput | AvisoUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AvisoScalarWhereInput | AvisoScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -11347,6 +13138,20 @@ export namespace Prisma {
     update?: XOR<XOR<CreditCardUpdateToOneWithWhereWithoutUserInput, CreditCardUpdateWithoutUserInput>, CreditCardUncheckedUpdateWithoutUserInput>
   }
 
+  export type AvisoUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AvisoCreateWithoutUserInput, AvisoUncheckedCreateWithoutUserInput> | AvisoCreateWithoutUserInput[] | AvisoUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AvisoCreateOrConnectWithoutUserInput | AvisoCreateOrConnectWithoutUserInput[]
+    upsert?: AvisoUpsertWithWhereUniqueWithoutUserInput | AvisoUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AvisoCreateManyUserInputEnvelope
+    set?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    disconnect?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    delete?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    connect?: AvisoWhereUniqueInput | AvisoWhereUniqueInput[]
+    update?: AvisoUpdateWithWhereUniqueWithoutUserInput | AvisoUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AvisoUpdateManyWithWhereWithoutUserInput | AvisoUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AvisoScalarWhereInput | AvisoScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutAccountsInput = {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
@@ -11387,9 +13192,9 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSessionsInput, UserUpdateWithoutSessionsInput>, UserUncheckedUpdateWithoutSessionsInput>
   }
 
-  export type UserCreateNestedOneWithoutTransactionsInput = {
-    create?: XOR<UserCreateWithoutTransactionsInput, UserUncheckedCreateWithoutTransactionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutTransactionsInput
+  export type UserCreateNestedOneWithoutAvisosInput = {
+    create?: XOR<UserCreateWithoutAvisosInput, UserUncheckedCreateWithoutAvisosInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAvisosInput
     connect?: UserWhereUniqueInput
   }
 
@@ -11399,6 +13204,32 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type EnumAvisoTipoFieldUpdateOperationsInput = {
+    set?: $Enums.AvisoTipo
+  }
+
+  export type EnumRecorrenciaFieldUpdateOperationsInput = {
+    set?: $Enums.Recorrencia
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type UserUpdateOneRequiredWithoutAvisosNestedInput = {
+    create?: XOR<UserCreateWithoutAvisosInput, UserUncheckedCreateWithoutAvisosInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAvisosInput
+    upsert?: UserUpsertWithoutAvisosInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAvisosInput, UserUpdateWithoutAvisosInput>, UserUncheckedUpdateWithoutAvisosInput>
+  }
+
+  export type UserCreateNestedOneWithoutTransactionsInput = {
+    create?: XOR<UserCreateWithoutTransactionsInput, UserUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTransactionsInput
+    connect?: UserWhereUniqueInput
   }
 
   export type EnumTransactionTypeFieldUpdateOperationsInput = {
@@ -11627,11 +13458,23 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
-  export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
+  export type NestedEnumAvisoTipoFilter<$PrismaModel = never> = {
+    equals?: $Enums.AvisoTipo | EnumAvisoTipoFieldRefInput<$PrismaModel>
+    in?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    not?: NestedEnumAvisoTipoFilter<$PrismaModel> | $Enums.AvisoTipo
+  }
+
+  export type NestedEnumRecorrenciaFilter<$PrismaModel = never> = {
+    equals?: $Enums.Recorrencia | EnumRecorrenciaFieldRefInput<$PrismaModel>
+    in?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecorrenciaFilter<$PrismaModel> | $Enums.Recorrencia
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -11648,6 +13491,41 @@ export namespace Prisma {
     _sum?: NestedFloatFilter<$PrismaModel>
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAvisoTipoWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AvisoTipo | EnumAvisoTipoFieldRefInput<$PrismaModel>
+    in?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AvisoTipo[] | ListEnumAvisoTipoFieldRefInput<$PrismaModel>
+    not?: NestedEnumAvisoTipoWithAggregatesFilter<$PrismaModel> | $Enums.AvisoTipo
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAvisoTipoFilter<$PrismaModel>
+    _max?: NestedEnumAvisoTipoFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRecorrenciaWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Recorrencia | EnumRecorrenciaFieldRefInput<$PrismaModel>
+    in?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Recorrencia[] | ListEnumRecorrenciaFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecorrenciaWithAggregatesFilter<$PrismaModel> | $Enums.Recorrencia
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRecorrenciaFilter<$PrismaModel>
+    _max?: NestedEnumRecorrenciaFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
   export type NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11727,6 +13605,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     value: number
+    color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
   }
@@ -11736,6 +13615,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     value: number
+    color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
   }
@@ -11756,6 +13636,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount?: number
     deadline?: Date | string | null
+    color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11766,6 +13647,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount?: number
     deadline?: Date | string | null
+    color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11785,6 +13667,7 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent?: number
+    color?: string
     createdAt?: Date | string
   }
 
@@ -11793,6 +13676,7 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent?: number
+    color?: string
     createdAt?: Date | string
   }
 
@@ -11823,6 +13707,42 @@ export namespace Prisma {
   export type CreditCardCreateOrConnectWithoutUserInput = {
     where: CreditCardWhereUniqueInput
     create: XOR<CreditCardCreateWithoutUserInput, CreditCardUncheckedCreateWithoutUserInput>
+  }
+
+  export type AvisoCreateWithoutUserInput = {
+    id?: string
+    nome: string
+    descricao?: string | null
+    valor?: number
+    data: Date | string
+    tipo?: $Enums.AvisoTipo
+    recorrencia?: $Enums.Recorrencia
+    pago?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AvisoUncheckedCreateWithoutUserInput = {
+    id?: string
+    nome: string
+    descricao?: string | null
+    valor?: number
+    data: Date | string
+    tipo?: $Enums.AvisoTipo
+    recorrencia?: $Enums.Recorrencia
+    pago?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AvisoCreateOrConnectWithoutUserInput = {
+    where: AvisoWhereUniqueInput
+    create: XOR<AvisoCreateWithoutUserInput, AvisoUncheckedCreateWithoutUserInput>
+  }
+
+  export type AvisoCreateManyUserInputEnvelope = {
+    data: AvisoCreateManyUserInput | AvisoCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -11910,6 +13830,7 @@ export namespace Prisma {
     title?: StringFilter<"Transaction"> | string
     description?: StringNullableFilter<"Transaction"> | string | null
     value?: FloatFilter<"Transaction"> | number
+    color?: StringFilter<"Transaction"> | string
     type?: EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     userId?: StringFilter<"Transaction"> | string
@@ -11940,6 +13861,7 @@ export namespace Prisma {
     targetAmount?: FloatFilter<"Goal"> | number
     currentAmount?: FloatFilter<"Goal"> | number
     deadline?: DateTimeNullableFilter<"Goal"> | Date | string | null
+    color?: StringFilter<"Goal"> | string
     createdAt?: DateTimeFilter<"Goal"> | Date | string
     updatedAt?: DateTimeFilter<"Goal"> | Date | string
     userId?: StringFilter<"Goal"> | string
@@ -11969,6 +13891,7 @@ export namespace Prisma {
     title?: StringFilter<"Limit"> | string
     limitAmount?: FloatFilter<"Limit"> | number
     currentSpent?: FloatFilter<"Limit"> | number
+    color?: StringFilter<"Limit"> | string
     createdAt?: DateTimeFilter<"Limit"> | Date | string
     userId?: StringFilter<"Limit"> | string
   }
@@ -11998,6 +13921,39 @@ export namespace Prisma {
     brand?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type AvisoUpsertWithWhereUniqueWithoutUserInput = {
+    where: AvisoWhereUniqueInput
+    update: XOR<AvisoUpdateWithoutUserInput, AvisoUncheckedUpdateWithoutUserInput>
+    create: XOR<AvisoCreateWithoutUserInput, AvisoUncheckedCreateWithoutUserInput>
+  }
+
+  export type AvisoUpdateWithWhereUniqueWithoutUserInput = {
+    where: AvisoWhereUniqueInput
+    data: XOR<AvisoUpdateWithoutUserInput, AvisoUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AvisoUpdateManyWithWhereWithoutUserInput = {
+    where: AvisoScalarWhereInput
+    data: XOR<AvisoUpdateManyMutationInput, AvisoUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type AvisoScalarWhereInput = {
+    AND?: AvisoScalarWhereInput | AvisoScalarWhereInput[]
+    OR?: AvisoScalarWhereInput[]
+    NOT?: AvisoScalarWhereInput | AvisoScalarWhereInput[]
+    id?: StringFilter<"Aviso"> | string
+    nome?: StringFilter<"Aviso"> | string
+    descricao?: StringNullableFilter<"Aviso"> | string | null
+    valor?: FloatFilter<"Aviso"> | number
+    data?: DateTimeFilter<"Aviso"> | Date | string
+    tipo?: EnumAvisoTipoFilter<"Aviso"> | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFilter<"Aviso"> | $Enums.Recorrencia
+    pago?: BoolFilter<"Aviso"> | boolean
+    createdAt?: DateTimeFilter<"Aviso"> | Date | string
+    updatedAt?: DateTimeFilter<"Aviso"> | Date | string
+    userId?: StringFilter<"Aviso"> | string
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
     name?: string | null
@@ -12009,6 +13965,7 @@ export namespace Prisma {
     goals?: GoalCreateNestedManyWithoutUserInput
     limits?: LimitCreateNestedManyWithoutUserInput
     creditCard?: CreditCardCreateNestedOneWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -12022,6 +13979,7 @@ export namespace Prisma {
     goals?: GoalUncheckedCreateNestedManyWithoutUserInput
     limits?: LimitUncheckedCreateNestedManyWithoutUserInput
     creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -12051,6 +14009,7 @@ export namespace Prisma {
     goals?: GoalUpdateManyWithoutUserNestedInput
     limits?: LimitUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -12064,6 +14023,7 @@ export namespace Prisma {
     goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
     limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -12077,6 +14037,7 @@ export namespace Prisma {
     goals?: GoalCreateNestedManyWithoutUserInput
     limits?: LimitCreateNestedManyWithoutUserInput
     creditCard?: CreditCardCreateNestedOneWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -12090,6 +14051,7 @@ export namespace Prisma {
     goals?: GoalUncheckedCreateNestedManyWithoutUserInput
     limits?: LimitUncheckedCreateNestedManyWithoutUserInput
     creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -12119,6 +14081,7 @@ export namespace Prisma {
     goals?: GoalUpdateManyWithoutUserNestedInput
     limits?: LimitUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -12128,6 +14091,79 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
+    limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
+    creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutAvisosInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    transactions?: TransactionCreateNestedManyWithoutUserInput
+    goals?: GoalCreateNestedManyWithoutUserInput
+    limits?: LimitCreateNestedManyWithoutUserInput
+    creditCard?: CreditCardCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAvisosInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    goals?: GoalUncheckedCreateNestedManyWithoutUserInput
+    limits?: LimitUncheckedCreateNestedManyWithoutUserInput
+    creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAvisosInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAvisosInput, UserUncheckedCreateWithoutAvisosInput>
+  }
+
+  export type UserUpsertWithoutAvisosInput = {
+    update: XOR<UserUpdateWithoutAvisosInput, UserUncheckedUpdateWithoutAvisosInput>
+    create: XOR<UserCreateWithoutAvisosInput, UserUncheckedCreateWithoutAvisosInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAvisosInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAvisosInput, UserUncheckedUpdateWithoutAvisosInput>
+  }
+
+  export type UserUpdateWithoutAvisosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    transactions?: TransactionUpdateManyWithoutUserNestedInput
+    goals?: GoalUpdateManyWithoutUserNestedInput
+    limits?: LimitUpdateManyWithoutUserNestedInput
+    creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAvisosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
     goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
     limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
@@ -12145,6 +14181,7 @@ export namespace Prisma {
     goals?: GoalCreateNestedManyWithoutUserInput
     limits?: LimitCreateNestedManyWithoutUserInput
     creditCard?: CreditCardCreateNestedOneWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTransactionsInput = {
@@ -12158,6 +14195,7 @@ export namespace Prisma {
     goals?: GoalUncheckedCreateNestedManyWithoutUserInput
     limits?: LimitUncheckedCreateNestedManyWithoutUserInput
     creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTransactionsInput = {
@@ -12187,6 +14225,7 @@ export namespace Prisma {
     goals?: GoalUpdateManyWithoutUserNestedInput
     limits?: LimitUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTransactionsInput = {
@@ -12200,6 +14239,7 @@ export namespace Prisma {
     goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
     limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutGoalsInput = {
@@ -12213,6 +14253,7 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutUserInput
     limits?: LimitCreateNestedManyWithoutUserInput
     creditCard?: CreditCardCreateNestedOneWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGoalsInput = {
@@ -12226,6 +14267,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
     limits?: LimitUncheckedCreateNestedManyWithoutUserInput
     creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGoalsInput = {
@@ -12255,6 +14297,7 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutUserNestedInput
     limits?: LimitUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGoalsInput = {
@@ -12268,6 +14311,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
     limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutLimitsInput = {
@@ -12281,6 +14325,7 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutUserInput
     goals?: GoalCreateNestedManyWithoutUserInput
     creditCard?: CreditCardCreateNestedOneWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLimitsInput = {
@@ -12294,6 +14339,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
     goals?: GoalUncheckedCreateNestedManyWithoutUserInput
     creditCard?: CreditCardUncheckedCreateNestedOneWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutLimitsInput = {
@@ -12323,6 +14369,7 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutUserNestedInput
     goals?: GoalUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLimitsInput = {
@@ -12336,6 +14383,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
     goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
     creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutCreditCardInput = {
@@ -12349,6 +14397,7 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutUserInput
     goals?: GoalCreateNestedManyWithoutUserInput
     limits?: LimitCreateNestedManyWithoutUserInput
+    avisos?: AvisoCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCreditCardInput = {
@@ -12362,6 +14411,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
     goals?: GoalUncheckedCreateNestedManyWithoutUserInput
     limits?: LimitUncheckedCreateNestedManyWithoutUserInput
+    avisos?: AvisoUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCreditCardInput = {
@@ -12391,6 +14441,7 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutUserNestedInput
     goals?: GoalUpdateManyWithoutUserNestedInput
     limits?: LimitUpdateManyWithoutUserNestedInput
+    avisos?: AvisoUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreditCardInput = {
@@ -12404,6 +14455,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
     goals?: GoalUncheckedUpdateManyWithoutUserNestedInput
     limits?: LimitUncheckedUpdateManyWithoutUserNestedInput
+    avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -12432,6 +14484,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     value: number
+    color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
   }
@@ -12442,6 +14495,7 @@ export namespace Prisma {
     targetAmount: number
     currentAmount?: number
     deadline?: Date | string | null
+    color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12451,7 +14505,21 @@ export namespace Prisma {
     title: string
     limitAmount: number
     currentSpent?: number
+    color?: string
     createdAt?: Date | string
+  }
+
+  export type AvisoCreateManyUserInput = {
+    id?: string
+    nome: string
+    descricao?: string | null
+    valor?: number
+    data: Date | string
+    tipo?: $Enums.AvisoTipo
+    recorrencia?: $Enums.Recorrencia
+    pago?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -12522,6 +14590,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12531,6 +14600,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12540,6 +14610,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12550,6 +14621,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12560,6 +14632,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12570,6 +14643,7 @@ export namespace Prisma {
     targetAmount?: FloatFieldUpdateOperationsInput | number
     currentAmount?: FloatFieldUpdateOperationsInput | number
     deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12579,6 +14653,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12587,6 +14662,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12595,7 +14671,47 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     limitAmount?: FloatFieldUpdateOperationsInput | number
     currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AvisoUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AvisoUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AvisoUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    valor?: FloatFieldUpdateOperationsInput | number
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    tipo?: EnumAvisoTipoFieldUpdateOperationsInput | $Enums.AvisoTipo
+    recorrencia?: EnumRecorrenciaFieldUpdateOperationsInput | $Enums.Recorrencia
+    pago?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

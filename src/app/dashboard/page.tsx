@@ -1,194 +1,344 @@
 "use client";
-import React, { useState } from 'react';
-import FloatingNav from '../_components/FloatingNav';
-import { api } from '~/trpc/react';
 
-// Simulação de dados do backend (T3 Stack / Prisma)
-interface Transaction {
-  id: string;
-  label: string;
-  value: number;
-  time: string;
-  type: 'income' | 'expense';
-}
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import FloatingNav, { type Tab } from "../_components/FloatingNav";
+import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
+import DashBoardLimit from "../_components/DashBoardLimit";
+import MetasDashboard from "../_components/MetasDashboard";
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { 
+  TrendingUp, Zap, Target, Sparkles, Send, 
+  Bot, EyeOff, ShieldCheck, Calendar, AlertCircle, Bell, CheckCircle2 
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import { differenceInDays, isPast, isToday } from "date-fns";
 
+// --- COMPONENTE DE CARROSSEL ---
+const AutoCarousel = ({ children, autoScrollSpeed = 5000, step = 340 }: any) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-export default function DashboardCincoPila() {
-  const [activeTab, setActiveTab] = useState<'home' | 'list' | 'goals' | 'limits'>('home');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: operacoes } = api.operacoes.getAll.useQuery();
-  const dailyOperacoes = operacoes?.filter((op) => op.createdAt.toISOString().split('T')[0] === new Date().toISOString().split('T')[0]);
-
-  const dailyExpenses: Transaction[] = [
-    ...(dailyOperacoes?.map((op) => ({
-      id: op.id,
-      label: op.description || '',
-      value: op.value,
-      time: op.createdAt.toISOString().substring(11, 16),
-      type: 'expense' as const,
-    })) ?? []),
-  ];
-  const { data: saldoAtual } = api.operacoes.saldoAtual.useQuery();
-  const { data: saidaDia } = api.operacoes.getDaily.useQuery();
-  const saidaDoDia = saidaDia?.filter(op => op.value < 0).reduce((acc, op) => acc + op.value, 0) || 0;
-  const { data: faturaAtual } = api.faturas.getLatest.useQuery();
-  const fatura = faturaAtual?.currentInvoice || 0;
-  const { data: gastosTotais } = api.operacoes.getDaily.useQuery();
-  const gastosDoDia = gastosTotais?.reduce((acc, op) => acc + op.value, 0) || 0;
-
-  const saldoFormatado = (saldoAtual || 0).toLocaleString('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  const [saldoInteiro, saldoCentavos] = saldoFormatado.split(',');
-
-  const now = new Date();
-  const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-  const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-  const topDateStr = `${diasSemana[now.getDay()]}, ${now.getDate()} ${meses[now.getMonth()]}`;
-  const bottomDateStr = `${meses[now.getMonth()]} . ${now.getFullYear()}`.toUpperCase();
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollRef.current.scrollBy({ left: step, behavior: "smooth" });
+        }
+      }
+    }, autoScrollSpeed);
+    return () => clearInterval(interval);
+  }, [isPaused, autoScrollSpeed, step]);
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans p-4 md:p-8 pb-32 overflow-x-hidden selection:bg-[#e6b33d]/30">
+    <div
+      ref={scrollRef}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      className="carousel carousel-center w-full gap-6 pb-4 no-scrollbar scroll-smooth snap-x snap-mandatory"
+    >
+      {children}
+    </div>
+  );
+};
 
-      {/* --- FLOATING NAV BAR --- */}
-      <FloatingNav
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onAddClick={() => setIsModalOpen(true)}
-      />
+export default function DashboardCincoPila() {
+  const utils = api.useUtils();
+  const [activeTab, setActiveTab] = useState<Tab>("home");
+  const [geminiPrompt, setGeminiPrompt] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiResponse, setAiResponse] = useState("Olá! Sou o assistente do Cinco Pila. Pergunte-me sobre seus gastos.");
+  const [aiEnabled, setAiEnabled] = useState(true);
 
-      <div className="max-w-7xl mx-auto relative pt-4">
+  const { status } = useSession();
 
-        {/* HEADER */}
-        <header className="flex justify-between items-center mb-10 md:mb-16">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#172c3c] rounded-xl flex items-center justify-center rotate-45 shadow-lg">
-              <span className="text-white font-black text-lg -rotate-45">5P</span>
-            </div>
-            <h2 className="font-black tracking-[0.2em] text-[10px] uppercase opacity-40 hidden sm:block">Control Center</h2>
+  // --- CARREGAMENTO DE DADOS ---
+  const { data: todasOperacoes } = api.operacoes.getAll.useQuery(undefined, { enabled: status === "authenticated" });
+  const { data: saldoAtual } = api.operacoes.saldoAtual.useQuery(undefined, { enabled: status === "authenticated" });
+  const { data: dailyIncomes } = api.operacoes.getDailyIncomes.useQuery(undefined, { enabled: status === "authenticated" });
+  const { data: dailyExpenses } = api.operacoes.getDailyExpenses.useQuery(undefined, { enabled: status === "authenticated" });
+  const { data: limits } = api.limites.getAll.useQuery(undefined, { enabled: status === "authenticated" });
+  const { data: goals } = api.metas.getAll.useQuery(undefined, { enabled: status === "authenticated" });
+  
+  // Avisos reais do Banco de Dados
+  const { data: avisosDB } = api.avisos.getAll.useQuery(undefined, { enabled: status === "authenticated" });
+
+  // Mutation para marcar aviso como resolvido
+  const resolverAviso = api.avisos.resolver.useMutation({
+    onSuccess: () => {
+      void utils.avisos.getAll.invalidate();
+    }
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("cinco-pila-ai-enabled");
+    if (saved !== null) setAiEnabled(saved === "true");
+  }, []);
+
+  const handleToggleAI = () => {
+    const newState = !aiEnabled;
+    setAiEnabled(newState);
+    localStorage.setItem("cinco-pila-ai-enabled", String(newState));
+  };
+
+  const entradasHoje = dailyIncomes?.reduce((acc, op) => acc + op.value, 0) ?? 0;
+  const gastosHoje = dailyExpenses?.reduce((acc, op) => acc + op.value, 0) ?? 0;
+
+  const handleGeminiAnalysis = async () => {
+    if (!geminiPrompt.trim() || !aiEnabled) return;
+    setIsAnalyzing(true);
+    setAiResponse("Analisando seus dados financeiros...");
+    try {
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: geminiPrompt,
+          financeData: { saldo: saldoAtual, operacoes: todasOperacoes?.slice(0, 30), metas: goals, limites: limits }
+        }),
+      });
+      const data = await response.json();
+      setAiResponse(response.ok ? data.text : "Erro ao conectar com a IA.");
+    } catch (error) {
+      setAiResponse("Erro de conexão.");
+    } finally {
+      setIsAnalyzing(false);
+      setGeminiPrompt("");
+    }
+  };
+
+  const chartData = useMemo(() => {
+    if (!todasOperacoes) return [];
+    const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const hoje = new Date();
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - (6 - i), 1);
+      const totalGasto = todasOperacoes
+        .filter((op) => op.type === "EXPENSE" && new Date(op.createdAt).getMonth() === d.getMonth() && new Date(op.createdAt).getFullYear() === d.getFullYear())
+        .reduce((acc, curr) => acc + curr.value, 0);
+      return { name: mesesNomes[d.getMonth()], value: totalGasto, isAtual: i === 6 };
+    });
+  }, [todasOperacoes]);
+
+  if (status === "loading") return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#172c3c]" /></div>;
+
+  const [saldoInteiro, saldoCentavos] = (saldoAtual || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 }).split(",");
+
+  return (
+    <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans selection:bg-[#e6b33d]">
+      <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="h-2 w-full bg-gradient-to-r from-[#172c3c] via-[#d96831] to-[#e6b33d] sticky top-0 z-[60]" />
+
+      <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 pb-32">
+        
+        {/* HEADER PATRIMÔNIO */}
+        <div className="flex flex-col items-center mb-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.6em] mb-2 opacity-30 italic">Patrimônio Consolidado</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-black text-[#d96831] italic">R$</span>
+            <h2 className="text-7xl md:text-9xl font-black tracking-tighter leading-none italic">
+              {saldoInteiro}<span className="text-[#e6b33d]">,</span><span className="text-3xl md:text-5xl opacity-20">{saldoCentavos}</span>
+            </h2>
           </div>
-          <div className="text-right" suppressHydrationWarning>
-            <p className="text-[10px] font-black opacity-30 uppercase">{topDateStr}</p>
-            <p className="font-black text-[#d96831]">{bottomDateStr}</p>
-          </div>
-        </header>
+        </div>
 
-        {/* GRID PRINCIPAL */}
-        <main className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-          {/* COLUNA ESQUERDA: GASTOS DO DIA (DENSIDADE) */}
-          <section className="lg:col-span-4 space-y-6 order-2 lg:order-1">
-            <div className="bg-white/70 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-xl">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xs font-black uppercase tracking-widest opacity-50">Gastos do Dia</h3>
-                <span className="text-[10px] font-bold text-[#d96831]">TOTAL R$ {gastosDoDia}</span>
-              </div>
-              <div className="space-y-4">
-                {dailyExpenses.map((exp) => (
-                  <div key={exp.id} className="flex justify-between items-center group">
-                    <div>
-                      <p className="text-sm font-bold group-hover:text-[#d96831] transition-colors">{exp.label}</p>
-                      <p className="text-[10px] opacity-40">{exp.time}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* --- COLUNA ESQUERDA --- */}
+          <div className="lg:col-span-3 space-y-6">
+             <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5">
+                <p className="text-[10px] font-black opacity-30 uppercase mb-4 italic">Balanço de Hoje</p>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-[10px] font-black mb-1">
+                      <span className="text-emerald-600">ENTRADAS</span>
+                      <span>R$ {entradasHoje.toLocaleString("pt-BR")}</span>
                     </div>
-                    <span className="font-black text-sm text-[#995052]">- {exp.value.toFixed(2)}</span>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${(entradasHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] font-black mb-1">
+                      <span className="text-[#995052]">SAÍDAS</span>
+                      <span>R$ {gastosHoje.toLocaleString("pt-BR")}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#995052] transition-all duration-500" style={{ width: `${(gastosHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
+                    </div>
+                  </div>
+                </div>
+             </div>
+
+            {/* QUADRO DE AVISOS DINÂMICO */}
+            <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5 flex flex-col h-[480px]">
+              <p className="text-[10px] font-black uppercase text-[#172c3c] mb-4 italic flex items-center gap-2">
+                <Bell size={14} className="text-[#d96831]" /> Agenda e Alertas
+              </p>
+              
+              <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
+                {avisosDB?.length === 0 && (
+                  <div className="h-full flex flex-col items-center justify-center opacity-10">
+                    <CheckCircle2 size={40} />
+                    <p className="text-[10px] font-black uppercase mt-2">Nada pendente</p>
+                  </div>
+                )}
+                
+                {avisosDB?.map((a) => {
+                  const dataAviso = new Date(a.data);
+                  const diasParaVencer = differenceInDays(dataAviso, new Date());
+                  const vencido = isPast(dataAviso) && !isToday(dataAviso);
+                  const venceHoje = isToday(dataAviso);
+
+                  return (
+                    <div key={a.id} className={`group p-4 rounded-2xl border-l-4 transition-all relative ${
+                      vencido || venceHoje ? 'border-[#995052] bg-red-50/50' : 'border-[#172c3c] bg-slate-50'
+                    }`}>
+                      <button 
+                        onClick={() => resolverAviso.mutate({ id: a.id })}
+                        className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-all p-1 bg-[#172c3c] text-[#e6b33d] rounded-full"
+                      >
+                        <CheckCircle2 size={12} />
+                      </button>
+
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="text-[10px] font-black uppercase italic leading-tight truncate w-3/4">{a.nome}</p>
+                        <span className="text-[9px] font-black">R$ {a.valor.toFixed(0)}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-1">
+                        <Calendar size={10} className={vencido ? "text-[#995052]" : "text-[#d96831]"}/>
+                        <p className={`text-[8px] font-bold uppercase ${vencido ? 'text-[#995052]' : 'opacity-40'}`}>
+                          {vencido ? "Atrasado" : venceHoje ? "Vence Hoje" : `Em ${diasParaVencer + 1} dias`}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* --- COLUNA CENTRAL --- */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xs font-black uppercase italic tracking-widest flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
+                </h3>
+              </div>
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData}>
+                    <Tooltip cursor={{ fill: "transparent" }} content={({ active, payload }) => active && payload?.length && (
+                      <div className="bg-[#172c3c] p-2 rounded-lg text-white font-black text-[10px] italic">R$ {payload?.[0]?.value}</div>
+                    )} />
+                    <Bar dataKey="value" radius={[8, 8, 8, 8]}>
+                      {chartData.map((entry, index) => <Cell key={index} fill={entry.isAtual ? "#d96831" : "#172c3c10"} />)}
+                    </Bar>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="space-y-3">
+                  <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Zap className="w-3 h-3 text-[#e6b33d]"/> Limites</p>
+                  <AutoCarousel>{limits?.map((l, idx) => <DashBoardLimit key={l.id} l={l} index={idx} />)}</AutoCarousel>
+               </div>
+               <div className="space-y-3">
+                  <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Target className="w-3 h-3 text-[#d96831]"/> Metas</p>
+                  <AutoCarousel>{goals?.map(g => <MetasDashboard key={g.id} goal={g} />)}</AutoCarousel>
+               </div>
+            </div>
+          </div>
+
+          {/* --- COLUNA DIREITA --- */}
+          <div className="lg:col-span-3 space-y-6">
+            <div className={`bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden transition-all duration-300 ${!aiEnabled ? 'opacity-80' : ''}`}>
+              <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
+                <div className="p-1.5 bg-[#e6b33d] rounded-lg"><Bot size={16} className="text-[#172c3c]" /></div>
+                <div>
+                  <p className="text-[10px] font-black uppercase leading-none">Cinco Pila AI</p>
+                  <p className="text-[8px] opacity-60 font-black italic">{aiEnabled ? "Modo Ativo" : "Privado"}</p>
+                </div>
+
+                <div className="dropdown dropdown-end ml-auto">
+                  <label tabIndex={0} className="btn btn-ghost btn-xs btn-circle text-[#e6b33d]">
+                    <Sparkles size={14} className={aiEnabled ? "animate-pulse" : "opacity-20"} />
+                  </label>
+                  <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow-2xl bg-[#172c3c] border border-white/10 rounded-2xl w-48 mt-2">
+                    <li>
+                      <button onClick={handleToggleAI} className="text-[10px] font-black uppercase flex justify-between hover:bg-white/5 active:bg-[#d96831]">
+                        {aiEnabled ? (<>Desligar IA <EyeOff size={14} className="text-[#995052]" /></>) : (<>Ligar IA <Zap size={14} className="text-[#e6b33d]" /></>)}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {aiEnabled ? (
+                <>
+                  <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50 space-y-4">
+                    <div className={`p-4 rounded-2xl shadow-sm border ${isAnalyzing ? 'opacity-50' : 'opacity-100'} transition-opacity bg-white border-black/5`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-[#e6b33d]" />
+                        <span className="text-[9px] font-black uppercase opacity-40 italic text-[#172c3c]">Insight</span>
+                      </div>
+                      <div className="text-[11px] font-medium leading-relaxed text-[#172c3c]">
+                        <ReactMarkdown components={{ 
+                          strong: ({...props}) => <span className="font-black text-[#d96831]" {...props} />,
+                          p: ({...props}) => <p className="mb-2 last:mb-0" {...props} />
+                        }}>
+                          {aiResponse}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white border-t border-black/5">
+                    <div className="relative flex items-center">
+                      <input 
+                        type="text" 
+                        value={geminiPrompt} 
+                        onChange={(e) => setGeminiPrompt(e.target.value)} 
+                        onKeyDown={(e) => e.key === 'Enter' && handleGeminiAnalysis()} 
+                        placeholder="Pergunte algo..." 
+                        className="w-full bg-slate-100 rounded-xl py-3 px-4 pr-12 text-xs font-bold outline-none text-[#172c3c]" 
+                      />
+                      <button onClick={handleGeminiAnalysis} className="absolute right-2 p-2 bg-[#172c3c] text-[#e6b33d] rounded-lg">
+                        <Send size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[#f8f9fa]">
+                  <ShieldCheck size={32} className="text-[#172c3c] opacity-10 mb-2" />
+                  <p className="text-[9px] font-black uppercase italic text-[#172c3c] opacity-40">Privacidade Ativa</p>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl relative overflow-hidden group">
+              <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Fluxo Recente</h3>
+              <div className="space-y-3">
+                {todasOperacoes?.slice(0, 6).map((op) => (
+                  <div key={op.id} className="flex justify-between items-center border-b border-white/5 pb-2">
+                    <p className="text-[9px] font-black uppercase truncate w-24 italic leading-none">{op.title}</p>
+                    <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>
+                      {op.type === "EXPENSE" ? "-" : "+"} {op.value.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* CARD FATURA ATUAL */}
-            <div className="bg-[#274862] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group">
-              <p className="text-[10px] font-black uppercase opacity-50 mb-2">Fatura Atual (Cartão)</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#e6b33d]">R$ {fatura}</span>
-              </div>
-              <div className="mt-4 flex gap-2">
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#d96831] w-[00%]" />
-                </div>
-              </div>
-              <div className="absolute top-[-20px] right-[-20px] text-6xl font-black opacity-5 rotate-12 group-hover:rotate-0 transition-transform">VISA</div>
-            </div>
-          </section>
-
-          {/* COLUNA CENTRAL: O SALDO (HERO) */}
-          <section className="lg:col-span-4 order-1 lg:order-2 flex flex-col items-center justify-center py-6">
-            <div className="relative flex items-center justify-center w-full min-h-[300px]">
-              {/* Órbitas Decorativas */}
-              <div className="absolute w-[300px] h-[300px] border border-[#172c3c]/5 rounded-full animate-[spin_20s_linear_infinite]" />
-              <div className="absolute w-[240px] h-[240px] border-2 border-[#172c3c]/5 border-dashed rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-
-              <div className="relative z-10 text-center">
-                <p className="text-[10px] font-black uppercase tracking-[0.5em] mb-2 opacity-40">Saldo Atual</p>
-                <h1 className="text-7xl md:text-8xl font-black tracking-tighter text-[#172c3c]">
-                  {saldoInteiro}<span className="text-[#d96831]">,</span>{saldoCentavos}
-                </h1>
-                <div className="mt-6 inline-flex flex-col items-center">
-                  <p className="text-[10px] font-black uppercase opacity-30 mb-1">Saída do Dia</p>
-                  <span className="bg-[#995052] text-white px-4 py-1 rounded-full text-xs font-black shadow-lg">
-                    ↓ R$ {saidaDoDia}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* COLUNA DIREITA: METAS E INDICADORES */}
-          <section className="lg:col-span-4 space-y-6 order-3">
-            {/* CARD META ATUAL */}
-            <div className="bg-[#172c3c] p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Meta: Viagem Japão</p>
-                    <h4 className="text-xl font-black text-[#e6b33d]">R$ 15.000</h4>
-                  </div>
-                  <span className="text-xs font-black opacity-40 italic">#2026</span>
-                </div>
-                <div className="flex items-end gap-3 mb-2">
-                  <span className="text-4xl font-black">45%</span>
-                  <span className="text-[10px] opacity-40 mb-1">COMPLETO</span>
-                </div>
-                <progress className="progress progress-warning w-full bg-white/10 h-3" value="45" max="100" />
-                <p className="text-[10px] mt-4 opacity-40 uppercase font-bold">Faltam R$ 8.250,00</p>
-              </div>
-            </div>
-
-            {/* MINI DASH ADICIONAL */}
-            <div className="bg-[#d96831] p-6 rounded-[2rem] text-white shadow-xl">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center font-black">JP</div>
-                <div>
-                  <p className="text-[10px] font-black uppercase opacity-70">Rendimento Previsto</p>
-                  <p className="text-xl font-black italic">+ R$ 412,00</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-        </main>
-
-        {/* FOOTER INFO: RESUMO DE INVESTIMENTOS */}
-        <footer className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-[#172c3c]/10 pt-8">
-          <div>
-            <p className="text-[9px] font-black uppercase opacity-40">Investido</p>
-            <p className="text-xl font-black text-[#274862]">R$ 45.201</p>
           </div>
-          <div>
-            <p className="text-[9px] font-black uppercase opacity-40">Liquidez</p>
-            <p className="text-xl font-black text-emerald-600">Alta</p>
-          </div>
-          <div>
-            <p className="text-[9px] font-black uppercase opacity-40">Pendências</p>
-            <p className="text-xl font-black text-[#995052]">Nenhuma</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[9px] font-black uppercase opacity-40">Patrimônio</p>
-            <p className="text-xl font-black text-[#172c3c]">R$ 57.651</p>
-          </div>
-        </footer>
-
+        </div>
       </div>
     </div>
   );

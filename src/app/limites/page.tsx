@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useMemo } from 'react';
-import FloatingNav from '../_components/FloatingNav';
+import FloatingNav, { type Tab } from '../_components/FloatingNav';
 import { api } from '~/trpc/react';
+import LimiteComponente from '../_components/LimiteComponente';
 
 export default function LimitesCincoPila() {
-  const [activeTab, setActiveTab] = useState<'home' | 'list' | 'goals' | 'limits'>('limits');
+  const [activeTab, setActiveTab] = useState<Tab>('limits');
   const utils = api.useUtils();
 
   // --- QUERIES & MUTATIONS ---
@@ -34,7 +35,8 @@ export default function LimitesCincoPila() {
   const [formData, setFormData] = useState({
     title: '',
     currentSpent: 0,
-    limitAmount: 0
+    limitAmount: 0,
+    color: '#172c3c'
   });
 
   // --- CÁLCULOS ---
@@ -53,11 +55,12 @@ export default function LimitesCincoPila() {
       setFormData({
         title: limit.title,
         currentSpent: limit.currentSpent,
-        limitAmount: limit.limitAmount
+        limitAmount: limit.limitAmount,
+        color: limit.color
       });
     } else {
       setEditingId(null);
-      setFormData({ title: '', currentSpent: 0, limitAmount: 0 });
+      setFormData({ title: '', currentSpent: 0, limitAmount: 0, color: '#172c3c' });
     }
     setIsModalOpen(true);
   };
@@ -72,8 +75,11 @@ export default function LimitesCincoPila() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans p-4 md:p-10 pb-32">
-      <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
+    <div className="min-h-screen p-4 md:p-4 lg:p-0 sm:p-0 bg-[#f0f2f5] text-[#172c3c] font-sans ">
+      <div className="h-2 absolute top-0 left-0 min-w-screen bg-gradient-to-r from-[#172c3c] via-[#d96831] to-[#e6b33d]" />
+      <div className='p-4 md:p-10 pb-2'></div>
+
+      <div className="max-w-7xl mx-auto animate-in fade-in duration-700 ">
         
         {/* HEADER */}
         <header className="mb-12 relative">
@@ -107,76 +113,9 @@ export default function LimitesCincoPila() {
           </button>
 
           {/* LISTAGEM DOS CARDS */}
-          {!isLoading && limits.map((l, index) => {
-            const usage = (l.currentSpent / l.limitAmount) * 100;
-            const isCritical = usage >= 85;
-
-            return (
-              <div 
-                key={l.id} 
-                style={{ animationDelay: `${index * 50}ms` }}
-                className={`
-                  group p-8 rounded-[2.5rem] shadow-xl transition-all duration-500 relative overflow-hidden animate-in zoom-in-95
-                  ${isCritical ? 'bg-[#995052] text-white scale-95 z-10' : 'bg-white text-[#172c3c] hover:shadow-2xl hover:-translate-y-1'}
-                  ${isCritical && usage < 100 ? 'ring-4 ring-[#995052] ring-offset-4 ring-offset-[#f0f2f5] animate-pulse-slow' : ''}
-                `}
-              >
-                {isCritical && (
-                  <div className="absolute top-4 right-6">
-                    <span className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-                    </span>
-                  </div>
-                )}
-
-                <div className="mb-10">
-                   <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-md ${isCritical ? 'bg-white/20' : 'bg-[#172c3c]/5'}`}>
-                      Gasto Ativo
-                    </span>
-                    <h3 className="text-xl font-black mt-3 leading-tight uppercase tracking-tighter truncate">{l.title}</h3>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-[10px] font-black opacity-40 uppercase">Gasto</p>
-                      <p className="text-2xl font-black italic">R$ {l.currentSpent.toFixed(2)}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-black opacity-40 uppercase">Teto</p>
-                      <p className="text-sm font-bold opacity-60">R$ {l.limitAmount}</p>
-                    </div>
-                  </div>
-
-                  <div className={`h-4 w-full rounded-full overflow-hidden p-1 border transition-all duration-500 ${isCritical ? 'border-white/20 bg-white/10' : 'border-[#172c3c]/10 bg-black/5'}`}>
-                    <div 
-                      className={`h-full rounded-full transition-all duration-1000 ease-out ${isCritical ? 'bg-[#e6b33d]' : 'bg-[#172c3c]'}`} 
-                      style={{ width: `${Math.min(usage, 100)}%` }}
-                    />
-                  </div>
-                  <p className={`text-[10px] font-black uppercase tracking-widest ${isCritical ? 'text-white' : 'opacity-40'}`}>
-                    {usage >= 100 ? '⚠️ LIMITE EXCEDIDO' : `RESTAM R$ ${(l.limitAmount - l.currentSpent).toFixed(2)}`}
-                  </p>
-                </div>
-
-                <div className="mt-8 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                   <button 
-                    onClick={() => handleOpenModal(l)}
-                    className={`btn btn-xs flex-1 rounded-lg border-none font-black ${isCritical ? 'bg-white text-[#995052] hover:bg-[#e6b33d]' : 'bg-[#172c3c] text-white'}`}
-                   >
-                     AJUSTAR
-                   </button>
-                   <button 
-                    onClick={() => { if(confirm("Remover?")) deleteLimit.mutate({ id: l.id }) }}
-                    className={`btn btn-xs rounded-lg border-none ${isCritical ? 'bg-white/20 text-white hover:bg-white/40' : 'bg-[#f0f2f5] text-[#172c3c]'}`}
-                   >
-                     ✕
-                   </button>
-                </div>
-              </div>
-            );
-          })}
+          {!isLoading && limits.map((l, index) => (
+            <LimiteComponente key={l.id} l={l} index={index} />
+          ))}
         </div>
 
         {/* MODAL */}
@@ -250,7 +189,7 @@ export default function LimitesCincoPila() {
         </section>
       </div>
 
-      <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} onAddClick={() => handleOpenModal()} />
+      <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <style jsx global>{`
         @keyframes pulse-slow {
@@ -261,6 +200,9 @@ export default function LimitesCincoPila() {
           animation: pulse-slow 3s infinite ease-in-out;
         }
       `}</style>
+      <div className='p-4 md:p-10 pb-32'></div>
+
     </div>
+
   );
 }

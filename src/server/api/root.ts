@@ -2,6 +2,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { operacoesRouter } from "./routers/operacoes";
 import { metasRouter } from "./routers/metas";
 import { limitesRouter } from "./routers/limites";
+import { avisosRouter } from "./routers/avisos";
 import { faturaRouter } from "./routers/fatura";
 
 /**
@@ -12,6 +13,7 @@ import { faturaRouter } from "./routers/fatura";
 export const appRouter = createTRPCRouter({
   operacoes: operacoesRouter,
   metas: metasRouter,
+  avisos: avisosRouter,
   limites: limitesRouter,
   faturas: faturaRouter,
 });

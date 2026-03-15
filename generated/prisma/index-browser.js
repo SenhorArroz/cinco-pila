@@ -152,11 +152,26 @@ exports.Prisma.SessionScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.AvisoScalarFieldEnum = {
+  id: 'id',
+  nome: 'nome',
+  descricao: 'descricao',
+  valor: 'valor',
+  data: 'data',
+  tipo: 'tipo',
+  recorrencia: 'recorrencia',
+  pago: 'pago',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+};
+
 exports.Prisma.TransactionScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
   value: 'value',
+  color: 'color',
   type: 'type',
   createdAt: 'createdAt',
   userId: 'userId'
@@ -168,6 +183,7 @@ exports.Prisma.GoalScalarFieldEnum = {
   targetAmount: 'targetAmount',
   currentAmount: 'currentAmount',
   deadline: 'deadline',
+  color: 'color',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'
@@ -178,6 +194,7 @@ exports.Prisma.LimitScalarFieldEnum = {
   title: 'title',
   limitAmount: 'limitAmount',
   currentSpent: 'currentSpent',
+  color: 'color',
   createdAt: 'createdAt',
   userId: 'userId'
 };
@@ -204,6 +221,20 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.AvisoTipo = exports.$Enums.AvisoTipo = {
+  AVISO: 'AVISO',
+  VENCIMENTO: 'VENCIMENTO',
+  COBRANCA: 'COBRANCA'
+};
+
+exports.Recorrencia = exports.$Enums.Recorrencia = {
+  NENHUMA: 'NENHUMA',
+  DIARIA: 'DIARIA',
+  SEMANAL: 'SEMANAL',
+  MENSAL: 'MENSAL',
+  ANUAL: 'ANUAL'
+};
+
 exports.TransactionType = exports.$Enums.TransactionType = {
   INCOME: 'INCOME',
   EXPENSE: 'EXPENSE'
@@ -213,6 +244,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   Account: 'Account',
   Session: 'Session',
+  Aviso: 'Aviso',
   Transaction: 'Transaction',
   Goal: 'Goal',
   Limit: 'Limit',

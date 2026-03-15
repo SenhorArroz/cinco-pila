@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import FloatingNav from '../_components/FloatingNav';
+import FloatingNav, { type Tab } from '../_components/FloatingNav';
 import { api } from '~/trpc/react';
 
 // --- TYPES (Sincronizados com seu Router) ---
@@ -13,7 +13,7 @@ interface GoalFormData {
 }
 
 export default function MetasCincoPila() {
-  const [activeTab, setActiveTab] = useState<'home' | 'list' | 'goals' | 'limits'>('goals');
+  const [activeTab, setActiveTab] = useState<Tab>('goals');
   const utils = api.useUtils();
 
   // --- QUERIES & MUTATIONS ---
@@ -78,7 +78,9 @@ export default function MetasCincoPila() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans p-4 md:p-10 pb-32">
+    <div className="min-h-screen p-4 md:p-4 lg:p-0 sm:p-0 bg-[#f0f2f5] text-[#172c3c] font-sans">
+      <div className="h-2 absolute top-0 left-0 min-w-screen bg-gradient-to-r from-[#172c3c] via-[#d96831] to-[#e6b33d]" />
+      <div className='p-4 md:p-10 pb-2'></div>
       <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
         
         {/* HEADER */}
@@ -241,7 +243,7 @@ export default function MetasCincoPila() {
         )}
       </div>
 
-      <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} onAddClick={() => handleOpenModal()} />
+      <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <style jsx global>{`
         @keyframes pulse-slow {
@@ -252,6 +254,8 @@ export default function MetasCincoPila() {
           animation: pulse-slow 3s infinite ease-in-out;
         }
       `}</style>
+      <div className='p-4 md:p-10 pb-32'></div>
+
     </div>
   );
 }
