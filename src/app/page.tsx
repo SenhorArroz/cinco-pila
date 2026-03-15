@@ -173,8 +173,6 @@ export default function LandingPage() {
               
               <div className="flex gap-12 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
                 <a href="/sobre" className="hover:text-[#d96831] transition-colors">sobre</a>
-                <a href="#" className="hover:text-[#d96831] transition-colors">Termos</a>
-                <a href="#" className="hover:text-[#d96831] transition-colors">Segurança</a>
               </div>
 
               <div className="text-[10px] font-bold opacity-30 uppercase tracking-widest">
