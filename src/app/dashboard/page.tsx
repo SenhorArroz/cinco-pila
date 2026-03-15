@@ -3,15 +3,25 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { 
   TrendingUp, Zap, Target, Sparkles, Send, 
   Bot, EyeOff, ShieldCheck, Calendar, Bell, CheckCircle2 
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { differenceInDays, isPast, isToday, format } from "date-fns";
+import { differenceInDays, isPast, isToday } from "date-fns";
+import dynamic from "next/dynamic";
 
-// Componentes internos (assumindo que existem no seu projeto)
+// --- IMPORT DINÂMICO DO RECHARTS ---
+// Isso garante que o gráfico não seja renderizado no servidor (SSR),
+// resolvendo o problema de sumir em produção.
+const ResponsiveContainer = dynamic(() => import("recharts").then(mod => mod.ResponsiveContainer), { ssr: false });
+const BarChart = dynamic(() => import("recharts").then(mod => mod.BarChart), { ssr: false });
+const Bar = dynamic(() => import("recharts").then(mod => mod.Bar), { ssr: false });
+const XAxis = dynamic(() => import("recharts").then(mod => mod.XAxis), { ssr: false });
+const Tooltip = dynamic(() => import("recharts").then(mod => mod.Tooltip), { ssr: false });
+const Cell = dynamic(() => import("recharts").then(mod => mod.Cell), { ssr: false });
+
+// Componentes internos
 import FloatingNav, { type Tab } from "../_components/FloatingNav";
 import DashBoardLimit from "../_components/DashBoardLimit";
 import MetasDashboard from "../_components/MetasDashboard";
@@ -57,6 +67,14 @@ export default function DashboardCincoPila() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiResponse, setAiResponse] = useState("Olá! Sou o assistente do Cinco Pila. Pergunte-me sobre seus gastos.");
   const [aiEnabled, setAiEnabled] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Garante que o componente montou no cliente antes de mostrar o gráfico
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem("cinco-pila-ai-enabled");
+    if (saved !== null) setAiEnabled(saved === "true");
+  }, []);
 
   // --- QUERIES (tRPC) ---
   const { data: todasOperacoes } = api.operacoes.getAll.useQuery(undefined, { enabled: status === "authenticated" });
@@ -72,12 +90,6 @@ export default function DashboardCincoPila() {
       void utils.avisos.getAll.invalidate();
     }
   });
-
-  // --- LÓGICA DE NEGÓCIO ---
-  useEffect(() => {
-    const saved = localStorage.getItem("cinco-pila-ai-enabled");
-    if (saved !== null) setAiEnabled(saved === "true");
-  }, []);
 
   const handleToggleAI = () => {
     const newState = !aiEnabled;
@@ -111,7 +123,6 @@ export default function DashboardCincoPila() {
     }
   };
 
-  // --- PROCESSAMENTO DO GRÁFICO (CORRIGIDO) ---
   const chartData = useMemo(() => {
     if (!todasOperacoes) return [];
     const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -119,7 +130,6 @@ export default function DashboardCincoPila() {
     
     return Array.from({ length: 7 }).map((_, i) => {
       const d = new Date(hoje.getFullYear(), hoje.getMonth() - (6 - i), 1);
-      
       const totalGasto = todasOperacoes
         .filter((op) => {
           const opDate = new Date(op.createdAt);
@@ -131,11 +141,7 @@ export default function DashboardCincoPila() {
         })
         .reduce((acc, curr) => acc + curr.value, 0);
 
-      return { 
-        name: mesesNomes[d.getMonth()], 
-        value: totalGasto, 
-        isAtual: i === 6 
-      };
+      return { name: mesesNomes[d.getMonth()], value: totalGasto, isAtual: i === 6 };
     });
   }, [todasOperacoes]);
 
@@ -154,30 +160,24 @@ export default function DashboardCincoPila() {
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans selection:bg-[#e6b33d]">
       <FloatingNav activeTab={activeTab} setActiveTab={setActiveTab} />
-      
-      {/* Top Banner Gradient */}
       <div className="h-2 w-full bg-gradient-to-r from-[#172c3c] via-[#d96831] to-[#e6b33d] sticky top-0 z-[60]" />
 
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 pb-32">
         
         {/* HEADER PATRIMÔNIO */}
         <div className="flex flex-col items-center mb-10">
-          <p className="text-[10px] font-black uppercase tracking-[0.6em] mb-2 opacity-30 italic">
-            Patrimônio Consolidado
-          </p>
+          <p className="text-[10px] font-black uppercase tracking-[0.6em] mb-2 opacity-30 italic">Patrimônio Consolidado</p>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-black text-[#d96831] italic">R$</span>
             <h2 className="text-7xl md:text-9xl font-black tracking-tighter leading-none italic">
-              {saldoInteiro}
-              <span className="text-[#e6b33d]">,</span>
-              <span className="text-3xl md:text-5xl opacity-20">{saldoCentavos}</span>
+              {saldoInteiro}<span className="text-[#e6b33d]">,</span><span className="text-3xl md:text-5xl opacity-20">{saldoCentavos}</span>
             </h2>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* --- COLUNA ESQUERDA (3/12) --- */}
+          {/* COLUNA ESQUERDA */}
           <div className="lg:col-span-3 space-y-6">
              <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5">
                 <p className="text-[10px] font-black opacity-30 uppercase mb-4 italic">Balanço de Hoje</p>
@@ -188,10 +188,7 @@ export default function DashboardCincoPila() {
                       <span>R$ {entradasHoje.toLocaleString("pt-BR")}</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-emerald-500 transition-all duration-700" 
-                        style={{ width: `${(entradasHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} 
-                      />
+                      <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${(entradasHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
                     </div>
                   </div>
                   <div>
@@ -200,51 +197,37 @@ export default function DashboardCincoPila() {
                       <span>R$ {gastosHoje.toLocaleString("pt-BR")}</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#995052] transition-all duration-700" 
-                        style={{ width: `${(gastosHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} 
-                      />
+                      <div className="h-full bg-[#995052] transition-all duration-700" style={{ width: `${(gastosHoje / (entradasHoje + gastosHoje || 1)) * 100}%` }} />
                     </div>
                   </div>
                 </div>
              </div>
 
-            {/* QUADRO DE AVISOS */}
             <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5 flex flex-col h-[480px]">
               <p className="text-[10px] font-black uppercase text-[#172c3c] mb-4 italic flex items-center gap-2">
                 <Bell size={14} className="text-[#d96831]" /> Agenda e Alertas
               </p>
-              
               <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
-                {(!avisosDB || avisosDB.length === 0) && (
+                {avisosDB?.length === 0 && (
                   <div className="h-full flex flex-col items-center justify-center opacity-10">
                     <CheckCircle2 size={40} />
                     <p className="text-[10px] font-black uppercase mt-2">Nada pendente</p>
                   </div>
                 )}
-                
                 {avisosDB?.map((a) => {
                   const dataAviso = new Date(a.data);
                   const diasParaVencer = differenceInDays(dataAviso, new Date());
                   const vencido = isPast(dataAviso) && !isToday(dataAviso);
                   const venceHoje = isToday(dataAviso);
-
                   return (
-                    <div key={a.id} className={`group p-4 rounded-2xl border-l-4 transition-all relative ${
-                      vencido || venceHoje ? 'border-[#995052] bg-red-50/50' : 'border-[#172c3c] bg-slate-50'
-                    }`}>
-                      <button 
-                        onClick={() => resolverAviso.mutate({ id: a.id })}
-                        className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-all p-1 bg-[#172c3c] text-[#e6b33d] rounded-full"
-                      >
+                    <div key={a.id} className={`group p-4 rounded-2xl border-l-4 transition-all relative ${vencido || venceHoje ? 'border-[#995052] bg-red-50/50' : 'border-[#172c3c] bg-slate-50'}`}>
+                      <button onClick={() => resolverAviso.mutate({ id: a.id })} className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-all p-1 bg-[#172c3c] text-[#e6b33d] rounded-full">
                         <CheckCircle2 size={12} />
                       </button>
-
                       <div className="flex justify-between items-start mb-1">
                         <p className="text-[10px] font-black uppercase italic leading-tight truncate w-3/4">{a.nome}</p>
                         <span className="text-[9px] font-black">R$ {a.valor.toFixed(0)}</span>
                       </div>
-                      
                       <div className="flex items-center gap-1">
                         <Calendar size={10} className={vencido ? "text-[#995052]" : "text-[#d96831]"}/>
                         <p className={`text-[8px] font-bold uppercase ${vencido ? 'text-[#995052]' : 'opacity-40'}`}>
@@ -258,7 +241,7 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* --- COLUNA CENTRAL (GRÁFICO) (6/12) --- */}
+          {/* COLUNA CENTRAL - GRÁFICO BLINDADO */}
           <div className="lg:col-span-6 space-y-6">
             <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5">
               <div className="flex justify-between items-center mb-6">
@@ -267,9 +250,9 @@ export default function DashboardCincoPila() {
                 </h3>
               </div>
               
-              {/* CONTAINER DO GRÁFICO CORRIGIDO */}
-              <div className="h-[250px] w-full min-w-0 overflow-hidden">
-                {chartData.length > 0 ? (
+              <div className="h-[250px] w-full min-w-0">
+                {/* O mounted garante que o Recharts só carregue no navegador */}
+                {mounted && chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                       <Tooltip 
@@ -304,7 +287,9 @@ export default function DashboardCincoPila() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl">
-                     <p className="text-[10px] font-black uppercase opacity-20">Sem dados financeiros</p>
+                     <p className="text-[10px] font-black uppercase opacity-20">
+                       {mounted ? "Sem dados financeiros" : "Carregando gráfico..."}
+                     </p>
                   </div>
                 )}
               </div>
@@ -312,27 +297,18 @@ export default function DashboardCincoPila() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-3">
-                  <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2">
-                    <Zap className="w-3 h-3 text-[#e6b33d]"/> Limites
-                  </p>
-                  <AutoCarousel>
-                    {limits?.map((l, idx) => <DashBoardLimit key={l.id} l={l} index={idx} />)}
-                  </AutoCarousel>
+                  <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Zap className="w-3 h-3 text-[#e6b33d]"/> Limites</p>
+                  <AutoCarousel>{limits?.map((l, idx) => <DashBoardLimit key={l.id} l={l} index={idx} />)}</AutoCarousel>
                </div>
                <div className="space-y-3">
-                  <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2">
-                    <Target className="w-3 h-3 text-[#d96831]"/> Metas
-                  </p>
-                  <AutoCarousel>
-                    {goals?.map(g => <MetasDashboard key={g.id} goal={g} />)}
-                  </AutoCarousel>
+                  <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Target className="w-3 h-3 text-[#d96831]"/> Metas</p>
+                  <AutoCarousel>{goals?.map(g => <MetasDashboard key={g.id} goal={g} />)}</AutoCarousel>
                </div>
             </div>
           </div>
 
-          {/* --- COLUNA DIREITA (IA E RECENTES) (3/12) --- */}
+          {/* COLUNA DIREITA */}
           <div className="lg:col-span-3 space-y-6">
-            {/* CINCO PILA AI */}
             <div className={`bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden transition-all duration-300 ${!aiEnabled ? 'opacity-80' : ''}`}>
               <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
                 <div className="p-1.5 bg-[#e6b33d] rounded-lg"><Bot size={16} className="text-[#172c3c]" /></div>
@@ -340,7 +316,6 @@ export default function DashboardCincoPila() {
                   <p className="text-[10px] font-black uppercase leading-none">Cinco Pila AI</p>
                   <p className="text-[8px] opacity-60 font-black italic">{aiEnabled ? "Modo Ativo" : "Privado"}</p>
                 </div>
-
                 <div className="dropdown dropdown-end ml-auto">
                   <label tabIndex={0} className="btn btn-ghost btn-xs btn-circle text-[#e6b33d]">
                     <Sparkles size={14} className={aiEnabled ? "animate-pulse" : "opacity-20"} />
@@ -348,17 +323,12 @@ export default function DashboardCincoPila() {
                   <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow-2xl bg-[#172c3c] border border-white/10 rounded-2xl w-48 mt-2">
                     <li>
                       <button onClick={handleToggleAI} className="text-[10px] font-black uppercase flex justify-between hover:bg-white/5 active:bg-[#d96831]">
-                        {aiEnabled ? (
-                          <>Desligar IA <EyeOff size={14} className="text-[#995052]" /></>
-                        ) : (
-                          <>Ligar IA <Zap size={14} className="text-[#e6b33d]" /></>
-                        )}
+                        {aiEnabled ? (<>Desligar IA <EyeOff size={14} className="text-[#995052]" /></>) : (<>Ligar IA <Zap size={14} className="text-[#e6b33d]" /></>)}
                       </button>
                     </li>
                   </ul>
                 </div>
               </div>
-
               {aiEnabled ? (
                 <>
                   <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50 space-y-4">
@@ -379,21 +349,8 @@ export default function DashboardCincoPila() {
                   </div>
                   <div className="p-3 bg-white border-t border-black/5">
                     <div className="relative flex items-center">
-                      <input 
-                        type="text" 
-                        value={geminiPrompt} 
-                        onChange={(e) => setGeminiPrompt(e.target.value)} 
-                        onKeyDown={(e) => e.key === 'Enter' && handleGeminiAnalysis()} 
-                        placeholder="Pergunte algo..." 
-                        className="w-full bg-slate-100 rounded-xl py-3 px-4 pr-12 text-xs font-bold outline-none text-[#172c3c] focus:ring-1 ring-[#e6b33d]" 
-                      />
-                      <button 
-                        onClick={handleGeminiAnalysis} 
-                        disabled={isAnalyzing}
-                        className="absolute right-2 p-2 bg-[#172c3c] text-[#e6b33d] rounded-lg disabled:opacity-50"
-                      >
-                        <Send size={14} />
-                      </button>
+                      <input type="text" value={geminiPrompt} onChange={(e) => setGeminiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleGeminiAnalysis()} placeholder="Pergunte algo..." className="w-full bg-slate-100 rounded-xl py-3 px-4 pr-12 text-xs font-bold outline-none text-[#172c3c] focus:ring-1 ring-[#e6b33d]" />
+                      <button onClick={handleGeminiAnalysis} disabled={isAnalyzing} className="absolute right-2 p-2 bg-[#172c3c] text-[#e6b33d] rounded-lg disabled:opacity-50"><Send size={14} /></button>
                     </div>
                   </div>
                 </>
@@ -405,7 +362,6 @@ export default function DashboardCincoPila() {
               )}
             </div>
 
-            {/* FLUXO RECENTE */}
             <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl relative overflow-hidden group">
               <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Fluxo Recente</h3>
               <div className="space-y-3">
