@@ -5,20 +5,18 @@ import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 import { 
   TrendingUp, Zap, Target, Send, 
-  Bot, Bell, CheckCircle2 
+  Bot, Bell, CheckCircle2, ArrowUpCircle, ArrowDownCircle
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { format, isToday } from "date-fns";
 import dynamic from "next/dynamic";
-import FloatingNav, { type Tab } from "../_components/FloatingNav";
-import DashBoardLimit from "../_components/DashBoardLimit";
-import MetasDashboard from "../_components/MetasDashboard";
 
-// --- COMPONENTE DE GRÁFICO (PROTEÇÃO TOTAL CONTRA ERROS DE DEPLOY) ---
+// --- COMPONENTE DE GRÁFICO (SINTAXE CORRIGIDA PARA DEPLOY) ---
 const ChartContainer = dynamic(() => import("recharts").then((re) => {
   const { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } = re;
   
-  const InternalChart = ({ data }: { data: any[] }) => {
+  // Definimos a função separadamente para evitar erro de declaração
+  function InternalChart({ data, onSelect }: { data: any[], onSelect: (mes: any) => void }) {
     return (
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
@@ -32,42 +30,50 @@ const ChartContainer = dynamic(() => import("recharts").then((re) => {
             cursor={{ fill: "#f0f2f5", radius: 10 }} 
             content={({ active, payload }) => {
               if (active && payload?.[0]) {
-                const value = payload[0].value;
                 return (
                   <div className="bg-[#172c3c] px-3 py-2 rounded-xl shadow-xl border border-white/10">
-                    <p className="text-[10px] font-black text-[#e6b33d] uppercase mb-1">Gasto Mensal</p>
-                    <p className="text-white font-black text-xs">R$ {Number(value).toLocaleString("pt-BR")}</p>
+                    <p className="text-[10px] font-black text-[#e6b33d] uppercase mb-1">{payload[0].payload.nameFull}</p>
+                    <p className="text-white font-black text-xs">R$ {Number(payload[0].value).toLocaleString("pt-BR")}</p>
+                    <p className="text-[8px] text-white/50 uppercase mt-1 italic">Clique para detalhes</p>
                   </div>
                 );
               }
               return null;
             }} 
           />
-          <Bar dataKey="value" radius={[10, 10, 10, 10]} barSize={32}>
-            {data.map((entry, index) => (
+          <Bar 
+            dataKey="value" 
+            radius={[10, 10, 10, 10]} 
+            barSize={32} 
+            onClick={(data) => onSelect(data)}
+            className="cursor-pointer"
+          >
+            {data.map((entry: any, index: number) => (
               <Cell 
                 key={`cell-${index}`} 
                 fill={entry.isAtual ? "#d96831" : "#172c3c"} 
-                fillOpacity={entry.isAtual ? 1 : 0.08} 
+                fillOpacity={entry.isAtual ? 1 : 0.08}
               />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
     );
-  };
-
-  return { default: InternalChart };
+  }
+  return InternalChart;
 }), { 
   ssr: false, 
   loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-[2rem]" /> 
 });
 
+import FloatingNav, { type Tab } from "../_components/FloatingNav";
+import DashBoardLimit from "../_components/DashBoardLimit";
+import MetasDashboard from "../_components/MetasDashboard";
+
 // --- CARROSSEL ---
 const AutoCarousel = ({ children, autoScrollSpeed = 5000, step = 340 }: { children: React.ReactNode, autoScrollSpeed?: number, step?: number }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
@@ -82,16 +88,8 @@ const AutoCarousel = ({ children, autoScrollSpeed = 5000, step = 340 }: { childr
     }, autoScrollSpeed);
     return () => clearInterval(interval);
   }, [isPaused, autoScrollSpeed, step]);
-
   return (
-    <div
-      ref={scrollRef}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      className="carousel carousel-center w-full gap-6 pb-4 no-scrollbar scroll-smooth snap-x snap-mandatory"
-    >
-      {children}
-    </div>
+    <div ref={scrollRef} onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)} className="carousel carousel-center w-full gap-6 pb-4 no-scrollbar scroll-smooth snap-x snap-mandatory">{children}</div>
   );
 };
 
@@ -102,25 +100,19 @@ export default function DashboardCincoPila() {
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [geminiPrompt, setGeminiPrompt] = useState("");
   const [aiResponse, setAiResponse] = useState("Diz aí, meu nobre! Como tá o patrimônio hoje?");
+  const [mesDetalhado, setMesDetalhado] = useState<any>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  useEffect(() => { setMounted(true); }, []);
   const isReady = mounted && status === "authenticated";
 
-  // Queries
   const { data: todasOperacoes } = api.operacoes.getAll.useQuery(undefined, { enabled: isReady });
   const { data: saldoAtual = 0 } = api.operacoes.saldoAtual.useQuery(undefined, { enabled: isReady });
   const { data: limits = [] } = api.limites.getAll.useQuery(undefined, { enabled: isReady });
   const { data: goals = [] } = api.metas.getAll.useQuery(undefined, { enabled: isReady });
   const { data: avisosDB = [] } = api.avisos.getAll.useQuery(undefined, { enabled: isReady });
 
-  const resolverAviso = api.avisos.resolver.useMutation({
-    onSuccess: () => { void utils.avisos.getAll.invalidate(); }
-  });
+  const resolverAviso = api.avisos.resolver.useMutation({ onSuccess: () => { void utils.avisos.getAll.invalidate(); } });
 
-  // Lógica do Balanço
   const balancoHoje = useMemo(() => {
     if (!todasOperacoes) return { entradas: 0, gastos: 0, total: 0 };
     const opsHoje = todasOperacoes.filter(op => isToday(new Date(op.createdAt)));
@@ -129,35 +121,39 @@ export default function DashboardCincoPila() {
     return { entradas, gastos, total: entradas + gastos };
   }, [todasOperacoes]);
 
-  // Lógica do Gráfico
   const chartData = useMemo(() => {
     if (!todasOperacoes || todasOperacoes.length === 0) return [];
     const mesesNomes = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+    const mesesNomesFull = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const hoje = new Date();
     
-    return Array.from({ length: 6 }).map((_, i) => {
+    const dados = Array.from({ length: 6 }).map((_, i) => {
       const d = new Date(hoje.getFullYear(), hoje.getMonth() - (5 - i), 1);
-      const totalGasto = todasOperacoes
-        .filter((op) => {
-          const opDate = new Date(op.createdAt);
-          return op.type === "EXPENSE" && opDate.getMonth() === d.getMonth() && opDate.getFullYear() === d.getFullYear();
-        })
-        .reduce((acc, curr) => acc + curr.value, 0);
+      const mesRef = d.getMonth();
+      const anoRef = d.getFullYear();
+      const opsMes = todasOperacoes.filter(op => {
+        const opDate = new Date(op.createdAt);
+        return opDate.getMonth() === mesRef && opDate.getFullYear() === anoRef;
+      });
+      const totalEntradas = opsMes.filter(op => op.type === "INCOME").reduce((acc, curr) => acc + curr.value, 0);
+      const totalSaidas = opsMes.filter(op => op.type === "EXPENSE").reduce((acc, curr) => acc + curr.value, 0);
 
       return { 
-        name: mesesNomes[d.getMonth()] ?? "---", 
-        value: totalGasto, 
+        name: mesesNomes[mesRef], 
+        nameFull: mesesNomesFull[mesRef],
+        value: totalSaidas,
+        entradas: totalEntradas,
+        saidas: totalSaidas,
         isAtual: i === 5 
       };
     });
+    if (!mesDetalhado && dados.length > 0) setMesDetalhado(dados[5]);
+    return dados;
   }, [todasOperacoes]);
 
-  if (!mounted || status === "loading") {
-    return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-[#172c3c]">CARREGANDO...</div>;
-  }
+  if (!mounted || status === "loading") return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-[#172c3c]">CARREGANDO...</div>;
 
-  const saldoFormatado = (saldoAtual ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-  const [saldoInteiro, saldoCentavos] = saldoFormatado.split(",");
+  const [saldoInteiro, saldoCentavos] = (saldoAtual ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 }).split(",");
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans pb-32">
@@ -165,7 +161,6 @@ export default function DashboardCincoPila() {
       <div className="h-2 w-full bg-gradient-to-r from-[#172c3c] via-[#d96831] to-[#e6b33d] sticky top-0 z-[60]" />
 
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6">
-        
         <div className="flex flex-col items-center mb-10 text-center">
           <p className="text-[10px] font-black uppercase tracking-[0.6em] mb-2 opacity-30 italic">Patrimônio Consolidado</p>
           <div className="flex items-baseline gap-2">
@@ -177,32 +172,22 @@ export default function DashboardCincoPila() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* ESQUERDA */}
           <div className="lg:col-span-3 space-y-6">
              <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5">
                 <p className="text-[10px] font-black opacity-30 uppercase mb-4 italic">Balanço de Hoje</p>
                 <div className="space-y-4">
                   <div>
-                    <div className="flex justify-between text-[10px] font-black mb-1 italic">
-                      <span className="text-emerald-600">ENTRADAS</span>
-                      <span>R$ {balancoHoje.entradas.toLocaleString("pt-BR")}</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${balancoHoje.total > 0 ? (balancoHoje.entradas/balancoHoje.total)*100 : 0}%` }} />
-                    </div>
+                    <div className="flex justify-between text-[10px] font-black mb-1 italic"><span className="text-emerald-600">ENTRADAS</span><span>R$ {balancoHoje.entradas.toLocaleString("pt-BR")}</span></div>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500" style={{ width: `${balancoHoje.total > 0 ? (balancoHoje.entradas/balancoHoje.total)*100 : 0}%` }} /></div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-[10px] font-black mb-1 italic">
-                      <span className="text-[#995052]">SAÍDAS</span>
-                      <span>R$ {balancoHoje.gastos.toLocaleString("pt-BR")}</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#995052] transition-all duration-700" style={{ width: `${balancoHoje.total > 0 ? (balancoHoje.gastos/balancoHoje.total)*100 : 0}%` }} />
-                    </div>
+                    <div className="flex justify-between text-[10px] font-black mb-1 italic"><span className="text-[#995052]">SAÍDAS</span><span>R$ {balancoHoje.gastos.toLocaleString("pt-BR")}</span></div>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-[#995052]" style={{ width: `${balancoHoje.total > 0 ? (balancoHoje.gastos/balancoHoje.total)*100 : 0}%` }} /></div>
                   </div>
                 </div>
              </div>
-
-            <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5 h-[450px] flex flex-col">
+             <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5 h-[450px] flex flex-col">
               <p className="text-[10px] font-black uppercase mb-4 flex items-center gap-2 italic"><Bell size={14} className="text-[#d96831]" /> Agenda</p>
               <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
                 {avisosDB.map((a) => (
@@ -216,22 +201,25 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
+          {/* CENTRAL */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5 relative overflow-hidden">
-              <h3 className="text-xs font-black uppercase italic mb-8 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
-              </h3>
-              <div className="h-[300px] w-full">
-                {chartData.length > 0 ? (
-                  <ChartContainer data={chartData} />
-                ) : (
-                  <div className="h-full flex items-center justify-center border-2 border-dashed border-slate-100 rounded-[2rem] opacity-20">
-                    <p className="text-[10px] font-black uppercase italic">Sem dados históricos</p>
+            <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5">
+              <div className="flex justify-between items-start mb-8">
+                <h3 className="text-xs font-black uppercase italic flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral</h3>
+                {mesDetalhado && (
+                  <div className="text-right">
+                    <p className="text-[9px] font-black opacity-30 uppercase italic leading-none">{mesDetalhado.nameFull}</p>
+                    <div className="flex gap-4 mt-2">
+                      <div className="flex items-center gap-1.5"><ArrowUpCircle size={12} className="text-emerald-500" /><span className="text-[11px] font-black">R$ {mesDetalhado.entradas.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</span></div>
+                      <div className="flex items-center gap-1.5"><ArrowDownCircle size={12} className="text-[#995052]" /><span className="text-[11px] font-black">R$ {mesDetalhado.saidas.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</span></div>
+                    </div>
                   </div>
                 )}
               </div>
+              <div className="h-[300px] w-full">
+                {chartData.length > 0 && <ChartContainer data={chartData} onSelect={setMesDetalhado} />}
+              </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-3">
                   <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Zap size={12} className="text-[#e6b33d]"/> Limites</p>
@@ -244,31 +232,23 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
+          {/* DIREITA */}
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden">
-              <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
-                <Bot size={18} className="text-[#e6b33d]" /><p className="text-[10px] font-black uppercase italic flex-1 leading-none">Cinco Pila AI</p>
-              </div>
-              <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50">
-                <div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed italic">
-                  <ReactMarkdown>{aiResponse}</ReactMarkdown>
-                </div>
-              </div>
+              <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2"><Bot size={18} className="text-[#e6b33d]" /><p className="text-[10px] font-black uppercase italic flex-1 leading-none">Cinco Pila AI</p></div>
+              <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50"><div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed italic"><ReactMarkdown>{aiResponse}</ReactMarkdown></div></div>
               <div className="p-3 bg-white border-t border-black/5 flex items-center gap-2">
                 <input type="text" value={geminiPrompt} onChange={(e) => setGeminiPrompt(e.target.value)} placeholder="Pergunte..." className="flex-1 bg-slate-100 rounded-xl py-3 px-4 text-xs font-bold outline-none" />
                 <button className="p-3 bg-[#172c3c] text-[#e6b33d] rounded-xl"><Send size={14} /></button>
               </div>
             </div>
-
             <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl">
               <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Recentes</h3>
               <div className="space-y-3">
                 {todasOperacoes?.slice(0, 5).map((op: any) => (
                   <div key={op.id} className="flex justify-between items-center border-b border-white/5 pb-2">
                     <p className="text-[9px] font-black uppercase truncate w-24 italic leading-none">{op.title}</p>
-                    <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>
-                      {op.type === "EXPENSE" ? "-" : "+"} {op.value.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
-                    </p>
+                    <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>{op.type === "EXPENSE" ? "-" : "+"} {op.value.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</p>
                   </div>
                 ))}
               </div>
