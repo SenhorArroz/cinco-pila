@@ -235,7 +235,7 @@ export default function DashboardCincoPila() {
                   </div>
                 </div>
              </div>
-             <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5 h-[450px] flex flex-col">
+             <div className="bg-white p-6 h-100 lg:h-155 rounded-[2.5rem] shadow-sm border border-black/5 flex flex-col">
               <p className="text-[10px] font-black uppercase mb-4 flex items-center gap-2 italic"><Bell size={14} className="text-[#d96831]" /> Agenda</p>
               <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
                 {avisosDB.map((a) => (
@@ -321,10 +321,10 @@ export default function DashboardCincoPila() {
               </div>
             </div>
 
-            <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl">
+            <div className="bg-[#172c3c] rounded-[2.5rem] h-90 p-6 text-white shadow-2xl">
               <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Recentes</h3>
               <div className="space-y-3">
-                {todasOperacoes?.slice(0, 5).map((op: any) => (
+                {todasOperacoes?.slice(0, 8).map((op: any) => (
                   <div key={op.id} className="flex justify-between items-center border-b border-white/5 pb-2">
                     <p className="text-[9px] font-black uppercase truncate w-24 italic leading-none">{op.title}</p>
                     <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>{op.type === "EXPENSE" ? "-" : "+"} {op.value.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</p>
