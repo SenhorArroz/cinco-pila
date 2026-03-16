@@ -5,7 +5,8 @@ import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 import { 
   TrendingUp, Zap, Target, Send, 
-  Bot, Bell, CheckCircle2, ArrowUpCircle, ArrowDownCircle
+  Bot, Bell, CheckCircle2, ArrowUpCircle, ArrowDownCircle,
+  Eye, EyeOff // Ícones adicionados
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { format, isToday } from "date-fns";
@@ -105,6 +106,7 @@ export default function DashboardCincoPila() {
   const [geminiPrompt, setGeminiPrompt] = useState("");
   const [aiResponse, setAiResponse] = useState("Diz aí, meu nobre! Como tá o patrimônio hoje?");
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(true); // Controle de privacidade
   const [mesDetalhado, setMesDetalhado] = useState<any>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -128,9 +130,9 @@ export default function DashboardCincoPila() {
     return { entradas, gastos, total: entradas + gastos };
   }, [todasOperacoes]);
 
-  // FUNÇÃO DE ENVIO PARA A IA (VIA FETCH DIRETO NA API)
+  // FUNÇÃO DE ENVIO PARA A IA
   const handleSendAI = async () => {
-    if (!geminiPrompt.trim() || isAiLoading) return;
+    if (!aiEnabled || !geminiPrompt.trim() || isAiLoading) return;
 
     const currentPrompt = geminiPrompt;
     setGeminiPrompt("");
@@ -138,7 +140,6 @@ export default function DashboardCincoPila() {
     setAiResponse("Deixa eu dar um confere aqui nos seus números... 🧐");
 
     try {
-      // Preparamos o contexto financeiro para a IA
       const financeData = {
         saldo: saldoAtual,
         hoje: balancoHoje,
@@ -155,7 +156,6 @@ export default function DashboardCincoPila() {
       });
 
       const data = await response.json();
-
       if (data.text) {
         setAiResponse(data.text);
       } else {
@@ -280,40 +280,63 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* DIREITA - CHAT AI */}
+          {/* DIREITA - CHAT AI COM BOTÃO DE PRIVACIDADE */}
           <div className="lg:col-span-3 space-y-6">
-            <div className="bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden">
-              <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
-                <Bot size={18} className="text-[#e6b33d]" />
-                <p className="text-[10px] font-black uppercase italic flex-1 leading-none">Cinco Pila AI</p>
+            <div className={`bg-white rounded-[2.5rem] shadow-xl border-2 transition-all duration-300 flex flex-col h-[400px] overflow-hidden ${aiEnabled ? 'border-[#172c3c]/5' : 'border-dashed border-[#172c3c]/20'}`}>
+              
+              {/* HEADER DA CAIXA DE IA COM BOTÃO INTEGRADO */}
+              <div className="p-4 bg-[#172c3c] text-white flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bot size={18} className={aiEnabled ? "text-[#e6b33d]" : "opacity-30"} />
+                  <p className="text-[10px] font-black uppercase italic leading-none">
+                    Cinco Pila AI {aiEnabled ? "" : "OFF"}
+                  </p>
+                </div>
+                {/* BOTÃO DE PRIVACIDADE */}
+                <button 
+                  onClick={() => setAiEnabled(!aiEnabled)}
+                  className={`p-1.5 rounded-lg transition-all ${aiEnabled ? 'text-white/40 hover:text-[#e6b33d]' : 'text-[#e6b33d] bg-white/10'}`}
+                  title={aiEnabled ? "Desativar IA" : "Ativar IA"}
+                >
+                  {aiEnabled ? <Eye size={16} /> : <EyeOff size={16} />}
+                </button>
               </div>
               
               <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50">
-                <div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed italic">
-                  {isAiLoading ? (
-                    <div className="flex items-center gap-2 py-2">
-                      <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce [animation-delay:0.2s]" />
-                      <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce [animation-delay:0.4s]" />
-                    </div>
-                  ) : (
-                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
-                  )}
-                </div>
+                {aiEnabled ? (
+                  <div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed italic">
+                    {isAiLoading ? (
+                      <div className="flex items-center gap-2 py-2">
+                        <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce [animation-delay:0.2s]" />
+                        <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce [animation-delay:0.4s]" />
+                      </div>
+                    ) : (
+                      <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                    )}
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center opacity-30 italic px-4">
+                    <EyeOff size={32} className="mb-2" />
+                    <p className="text-[10px] font-black uppercase leading-tight">Modo de Privacidade Ativo</p>
+                    <p className="text-[8px] font-bold mt-1">A IA não terá acesso aos seus dados enquanto estiver desligada.</p>
+                  </div>
+                )}
               </div>
 
               <div className="p-3 bg-white border-t border-black/5 flex items-center gap-2">
                 <input 
                   type="text" 
+                  disabled={!aiEnabled}
                   value={geminiPrompt} 
                   onChange={(e) => setGeminiPrompt(e.target.value)} 
                   onKeyDown={(e) => e.key === "Enter" && handleSendAI()}
-                  placeholder="Pergunte..." 
-                  className="flex-1 bg-slate-100 rounded-xl py-3 px-4 text-xs font-bold outline-none" 
+                  placeholder={aiEnabled ? "Pergunte..." : "Ative para perguntar"} 
+                  className="flex-1 bg-slate-100 rounded-xl py-3 px-4 text-xs font-bold outline-none disabled:cursor-not-allowed" 
                 />
                 <button 
                   onClick={handleSendAI}
-                  disabled={isAiLoading}
+                  disabled={isAiLoading || !aiEnabled}
                   className="p-3 bg-[#172c3c] text-[#e6b33d] rounded-xl hover:bg-[#d96831] transition-all disabled:opacity-50 active:scale-95"
                 >
                   <Send size={14} />

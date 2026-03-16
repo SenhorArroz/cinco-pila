@@ -50,7 +50,7 @@ export const operacoesRouter = createTRPCRouter({
     }),
 
     update: protectedProcedure
-        .input(z.object({ id: z.string().min(1), title: z.string().min(1), tagId: z.string().min(1).optional(), description: z.string().min(1), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
+        .input(z.object({ id: z.string().min(1), title: z.string().min(1), tagId: z.string().optional(), description: z.string().optional(), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
         .mutation(async ({ ctx, input }) => {
             return ctx.db.transaction.update({
                 where: { id: input.id },
