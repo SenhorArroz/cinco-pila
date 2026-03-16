@@ -174,6 +174,16 @@ exports.Prisma.TransactionScalarFieldEnum = {
   color: 'color',
   type: 'type',
   createdAt: 'createdAt',
+  tagId: 'tagId',
+  userId: 'userId'
+};
+
+exports.Prisma.TransactionTagScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  color: 'color',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   userId: 'userId'
 };
 
@@ -246,6 +256,7 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   Aviso: 'Aviso',
   Transaction: 'Transaction',
+  TransactionTag: 'TransactionTag',
   Goal: 'Goal',
   Limit: 'Limit',
   CreditCard: 'CreditCard'

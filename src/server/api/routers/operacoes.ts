@@ -26,13 +26,14 @@ export const operacoesRouter = createTRPCRouter({
 
 
     create: protectedProcedure
-        .input(z.object({ title: z.string().min(1), description: z.string().min(1), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
+        .input(z.object({ title: z.string().min(1), tagId: z.string().min(1).optional(), description: z.string().min(1), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
         .mutation(async ({ ctx, input }) => {
             return ctx.db.transaction.create({
                 data: {
                     title: input.title,
                     description: input.description,
                     value: input.value,
+                    tag: { connect: { id: input.tagId } },
                     type: input.type,
                     user: { connect: { id: ctx.session.user.id } },
                 },
@@ -49,7 +50,7 @@ export const operacoesRouter = createTRPCRouter({
     }),
 
     update: protectedProcedure
-        .input(z.object({ id: z.string().min(1), title: z.string().min(1), description: z.string().min(1), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
+        .input(z.object({ id: z.string().min(1), title: z.string().min(1), tagId: z.string().min(1).optional(), description: z.string().min(1), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
         .mutation(async ({ ctx, input }) => {
             return ctx.db.transaction.update({
                 where: { id: input.id },
@@ -57,6 +58,7 @@ export const operacoesRouter = createTRPCRouter({
                     title: input.title,
                     description: input.description,
                     value: input.value,
+                    tag: { connect: { id: input.tagId } },
                     type: input.type,
                 },
             });

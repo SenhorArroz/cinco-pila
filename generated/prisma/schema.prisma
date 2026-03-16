@@ -25,11 +25,12 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  transactions Transaction[]
-  goals        Goal[]
-  limits       Limit[]
-  creditCard   CreditCard?
-  avisos       Aviso[]
+  transactions    Transaction[]
+  goals           Goal[]
+  limits          Limit[]
+  creditCard      CreditCard?
+  avisos          Aviso[]
+  transactionTags TransactionTag[]
 }
 
 // Necessary for Next auth
@@ -97,16 +98,30 @@ model Transaction {
   description String?
   value       Float
   color       String          @default("#ffffffff")
-  type        TransactionType @default(EXPENSE) // INCOME ou EXPENSE
+  type        TransactionType @default(EXPENSE)
   createdAt   DateTime        @default(now())
 
+  tagId  String?
+  tag    TransactionTag? @relation(fields: [tagId], references: [id], onDelete: Cascade)
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum TransactionType {
   INCOME
   EXPENSE
+}
+
+model TransactionTag {
+  id           String        @id @default(cuid())
+  name         String
+  color        String        @default("#ffffffff")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Goal {

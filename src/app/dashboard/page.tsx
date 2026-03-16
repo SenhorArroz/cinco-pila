@@ -11,11 +11,10 @@ import ReactMarkdown from "react-markdown";
 import { format, isToday } from "date-fns";
 import dynamic from "next/dynamic";
 
-// --- COMPONENTE DE GRÁFICO (SINTAXE CORRIGIDA PARA DEPLOY) ---
+// --- COMPONENTE DE GRÁFICO ---
 const ChartContainer = dynamic(() => import("recharts").then((re) => {
   const { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } = re;
   
-  // Definimos a função separadamente para evitar erro de declaração
   function InternalChart({ data, onSelect }: { data: any[], onSelect: (mes: any) => void }) {
     return (
       <ResponsiveContainer width="100%" height="100%">
@@ -98,19 +97,24 @@ export default function DashboardCincoPila() {
   const { status } = useSession();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("home");
+  
+  // ESTADOS DA IA
   const [geminiPrompt, setGeminiPrompt] = useState("");
   const [aiResponse, setAiResponse] = useState("Diz aí, meu nobre! Como tá o patrimônio hoje?");
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [mesDetalhado, setMesDetalhado] = useState<any>(null);
 
   useEffect(() => { setMounted(true); }, []);
   const isReady = mounted && status === "authenticated";
 
+  // QUERIES
   const { data: todasOperacoes } = api.operacoes.getAll.useQuery(undefined, { enabled: isReady });
   const { data: saldoAtual = 0 } = api.operacoes.saldoAtual.useQuery(undefined, { enabled: isReady });
   const { data: limits = [] } = api.limites.getAll.useQuery(undefined, { enabled: isReady });
   const { data: goals = [] } = api.metas.getAll.useQuery(undefined, { enabled: isReady });
   const { data: avisosDB = [] } = api.avisos.getAll.useQuery(undefined, { enabled: isReady });
 
+  // MUTATIONS
   const resolverAviso = api.avisos.resolver.useMutation({ onSuccess: () => { void utils.avisos.getAll.invalidate(); } });
 
   const balancoHoje = useMemo(() => {
@@ -120,6 +124,45 @@ export default function DashboardCincoPila() {
     const gastos = opsHoje.filter(op => op.type === "EXPENSE").reduce((acc, curr) => acc + curr.value, 0);
     return { entradas, gastos, total: entradas + gastos };
   }, [todasOperacoes]);
+
+  // FUNÇÃO DE ENVIO PARA A IA (VIA FETCH DIRETO NA API)
+  const handleSendAI = async () => {
+    if (!geminiPrompt.trim() || isAiLoading) return;
+
+    const currentPrompt = geminiPrompt;
+    setGeminiPrompt("");
+    setIsAiLoading(true);
+    setAiResponse("Deixa eu dar um confere aqui nos seus números... 🧐");
+
+    try {
+      // Preparamos o contexto financeiro para a IA
+      const financeData = {
+        saldo: saldoAtual,
+        hoje: balancoHoje,
+        limites: limits.map(l => ({ nome: l.nome, max: l.valor, usado: l.valorAtual })),
+        metas: goals.map(g => ({ nome: g.title, alvo: g.targetValue, progresso: g.currentValue }))
+      };
+
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: currentPrompt, financeData }),
+      });
+
+      const data = await response.json();
+
+      if (data.text) {
+        setAiResponse(data.text);
+      } else {
+        setAiResponse("Deu um erro na comunicação com o Google. Tenta de novo?");
+      }
+    } catch (error) {
+      console.error("Erro IA:", error);
+      setAiResponse("Ih, meu processador fritou. Tenta mandar de novo?");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const chartData = useMemo(() => {
     if (!todasOperacoes || todasOperacoes.length === 0) return [];
@@ -232,16 +275,47 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* DIREITA */}
+          {/* DIREITA - CHAT AI */}
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden">
-              <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2"><Bot size={18} className="text-[#e6b33d]" /><p className="text-[10px] font-black uppercase italic flex-1 leading-none">Cinco Pila AI</p></div>
-              <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50"><div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed italic"><ReactMarkdown>{aiResponse}</ReactMarkdown></div></div>
+              <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
+                <Bot size={18} className="text-[#e6b33d]" />
+                <p className="text-[10px] font-black uppercase italic flex-1 leading-none">Cinco Pila AI</p>
+              </div>
+              
+              <div className="flex-1 p-4 overflow-y-auto no-scrollbar bg-slate-50/50">
+                <div className="p-4 rounded-2xl shadow-sm border bg-white border-black/5 text-[11px] font-medium leading-relaxed italic">
+                  {isAiLoading ? (
+                    <div className="flex items-center gap-2 py-2">
+                      <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <div className="w-2 h-2 bg-[#d96831] rounded-full animate-bounce [animation-delay:0.4s]" />
+                    </div>
+                  ) : (
+                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                  )}
+                </div>
+              </div>
+
               <div className="p-3 bg-white border-t border-black/5 flex items-center gap-2">
-                <input type="text" value={geminiPrompt} onChange={(e) => setGeminiPrompt(e.target.value)} placeholder="Pergunte..." className="flex-1 bg-slate-100 rounded-xl py-3 px-4 text-xs font-bold outline-none" />
-                <button className="p-3 bg-[#172c3c] text-[#e6b33d] rounded-xl"><Send size={14} /></button>
+                <input 
+                  type="text" 
+                  value={geminiPrompt} 
+                  onChange={(e) => setGeminiPrompt(e.target.value)} 
+                  onKeyDown={(e) => e.key === "Enter" && handleSendAI()}
+                  placeholder="Pergunte..." 
+                  className="flex-1 bg-slate-100 rounded-xl py-3 px-4 text-xs font-bold outline-none" 
+                />
+                <button 
+                  onClick={handleSendAI}
+                  disabled={isAiLoading}
+                  className="p-3 bg-[#172c3c] text-[#e6b33d] rounded-xl hover:bg-[#d96831] transition-all disabled:opacity-50 active:scale-95"
+                >
+                  <Send size={14} />
+                </button>
               </div>
             </div>
+
             <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl">
               <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Recentes</h3>
               <div className="space-y-3">
