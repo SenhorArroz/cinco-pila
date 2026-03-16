@@ -139,8 +139,9 @@ export default function DashboardCincoPila() {
       const financeData = {
         saldo: saldoAtual,
         hoje: balancoHoje,
-        limites: limits.map(l => ({ nome: l.nome, max: l.valor, usado: l.valorAtual })),
-        metas: goals.map(g => ({ nome: g.title, alvo: g.targetValue, progresso: g.currentValue }))
+        limites: limits.map(l => ({ nome: l.title, max: l.limitAmount, usado: l.currentSpent })),
+        metas: goals.map(g => ({ nome: g.title, alvo: g.targetAmount, progresso: g.currentAmount })),
+        avisos: avisosDB.map(a => ({ nome: a.nome, data: a.data, pago: a.pago })),
       };
 
       const response = await fetch("/api/gemini", {

@@ -189,55 +189,73 @@ export default function MetasCincoPila() {
                 {editingId ? 'Ajustar Meta' : 'Novo Sonho'}
               </h3>
               
-              <form onSubmit={handleSave} className="space-y-4">
-                <div className="form-control">
-                  <label className="label uppercase font-black text-[10px] opacity-40">O que vamos conquistar?</label>
-                  <input 
-                    type="text" required className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-bold" 
-                    value={formData.title}
-                    onChange={e => setFormData({...formData, title: e.target.value})}
-                  />
-                </div>
+              <form onSubmit={handleSave} className="grid grid-cols-6 gap-x-4 gap-y-2">
+  {/* Título: Ocupa tudo */}
+  <div className="form-control col-span-6">
+    <label className="label uppercase font-black text-[10px] opacity-40">O que vamos conquistar?</label>
+    <input 
+      type="text" 
+      required 
+      className="input input-bordered bg-white text-black border-2 border-[#172c3c] rounded-2xl font-bold w-full" 
+      value={formData.title}
+      onChange={e => setFormData({...formData, title: e.target.value})}
+    />
+  </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="form-control">
-                    <label className="label uppercase font-black text-[10px] opacity-40">Guardado (R$)</label>
-                    <input 
-                      type="number" step="0.01" className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-bold" 
-                      value={formData.currentAmount}
-                      onChange={e => setFormData({...formData, currentAmount: Number(e.target.value)})}
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label uppercase font-black text-[10px] opacity-40">Alvo (R$)</label>
-                    <input 
-                      type="number" step="0.01" required className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-black text-[#d96831]" 
-                      value={formData.targetAmount}
-                      onChange={e => setFormData({...formData, targetAmount: Number(e.target.value)})}
-                    />
-                  </div>
-                </div>
+  {/* Guardado: 3 colunas (Metade) */}
+  <div className="form-control col-span-3">
+    <label className="label uppercase font-black text-[10px] opacity-40">Guardado (R$)</label>
+    <input 
+      type="number" 
+      step="0.01" 
+      className="input input-bordered bg-white text-black border-2 border-[#172c3c] rounded-2xl font-bold w-full" 
+      value={formData.currentAmount}
+      onChange={e => setFormData({...formData, currentAmount: Number(e.target.value)})}
+    />
+  </div>
 
-                <div className="form-control">
-                  <label className="label uppercase font-black text-[10px] opacity-40">Data Limite (Opcional)</label>
-                  <input 
-                    type="date" className="input input-bordered text-white border-2 border-[#172c3c] rounded-2xl font-bold" 
-                    value={formData.deadline}
-                    onChange={e => setFormData({...formData, deadline: e.target.value})}
-                  />
-                </div>
+  {/* Alvo: 3 colunas (Metade) */}
+  <div className="form-control col-span-3">
+    <label className="label uppercase font-black text-[10px] opacity-40">Alvo (R$)</label>
+    <input 
+      type="number" 
+      step="0.01" 
+      required 
+      className="input input-bordered bg-white text-[#d96831] border-2 border-[#172c3c] rounded-2xl font-black w-full" 
+      value={formData.targetAmount}
+      onChange={e => setFormData({...formData, targetAmount: Number(e.target.value)})}
+    />
+  </div>  
 
-                <div className="modal-action flex flex-col gap-2">
-                  <button 
-                    disabled={createGoal.isPending || updateGoal.isPending}
-                    type="submit" 
-                    className="btn btn-block bg-[#172c3c] text-white rounded-2xl border-none font-black h-14 hover:bg-[#d96831]"
-                  >
-                    {(createGoal.isPending || updateGoal.isPending) ? 'SALVANDO...' : 'CONFIRMAR'}
-                  </button>
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-ghost font-bold opacity-30">CANCELAR</button>
-                </div>
-              </form>
+  {/* Data Limite: Ocupa tudo */}
+  <div className="form-control col-span-6">
+    <label className="label uppercase font-black text-[10px] opacity-40">Data Limite (Opcional)</label>
+    <input 
+      type="date" 
+      className="input input-bordered bg-white text-black border-2 border-[#172c3c] rounded-2xl font-bold w-full" 
+      value={formData.deadline}
+      onChange={e => setFormData({...formData, deadline: e.target.value})}
+    />
+  </div>
+
+  {/* Ações: Ocupa tudo */}
+  <div className="col-span-6 flex flex-col gap-2 mt-4">
+    <button 
+      disabled={createGoal.isPending || updateGoal.isPending}
+      type="submit" 
+      className="btn bg-[#172c3c] text-white rounded-2xl border-none font-black h-14 hover:bg-[#d96831] w-full"
+    >
+      {(createGoal.isPending || updateGoal.isPending) ? 'SALVANDO...' : 'CONFIRMAR'}
+    </button>
+    <button 
+      type="button" 
+      onClick={() => setIsModalOpen(false)} 
+      className="btn btn-ghost font-bold opacity-30 w-full"
+    >
+      CANCELAR
+    </button>
+  </div>
+</form>
             </div>
           </div>
         )}
