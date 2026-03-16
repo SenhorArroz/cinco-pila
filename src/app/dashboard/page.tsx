@@ -9,11 +9,10 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { format } from "date-fns";
-import dynamicImport from "next/dynamic";
+import nextDynamic from "next/dynamic"; // Alterado o nome do import para evitar conflitos
 
 // --- COMPONENTE DE FLUXO SEMESTRAL ---
-// Renomeado para dynamicImport para não conflitar com nada
-const SafeChart = dynamicImport(() => import("../_components/SafeChart"), { 
+const SafeChart = nextDynamic(() => import("../_components/SafeChart"), { 
   ssr: false,
   loading: () => <div className="h-[280px] w-full bg-transparent animate-pulse" />
 });
@@ -68,25 +67,23 @@ export default function DashboardCincoPila() {
 
   const isReady = mounted && status === "authenticated";
 
-  // Queries - Restauradas exatamente como estavam na versão funcional
+  // Queries - Sem staleTime agressivo para evitar cache fantasma na Vercel
   const { data: todasOperacoes } = api.operacoes.getAll.useQuery(undefined, { enabled: isReady });
   const { data: saldoAtual = 0 } = api.operacoes.saldoAtual.useQuery(undefined, { enabled: isReady });
-  const { data: dailyIncomes } = api.operacoes.getDailyIncomes.useQuery(undefined, { enabled: isReady });
-  const { data: dailyExpenses } = api.operacoes.getDailyExpenses.useQuery(undefined, { enabled: isReady });
-  const { data: limits } = api.limites.getAll.useQuery(undefined, { enabled: isReady });
-  const { data: goals } = api.metas.getAll.useQuery(undefined, { enabled: isReady });
-  const { data: avisosDB } = api.avisos.getAll.useQuery(undefined, { enabled: isReady });
+  const { data: dailyIncomes = [] } = api.operacoes.getDailyIncomes.useQuery(undefined, { enabled: isReady });
+  const { data: dailyExpenses = [] } = api.operacoes.getDailyExpenses.useQuery(undefined, { enabled: isReady });
+  const { data: limits = [] } = api.limites.getAll.useQuery(undefined, { enabled: isReady });
+  const { data: goals = [] } = api.metas.getAll.useQuery(undefined, { enabled: isReady });
+  const { data: avisosDB = [] } = api.avisos.getAll.useQuery(undefined, { enabled: isReady });
 
   const resolverAviso = api.avisos.resolver.useMutation({
     onSuccess: () => { void utils.avisos.getAll.invalidate(); }
   });
 
-  // Cálculos de Balanço (Corrigido para usar os dados das queries)
   const entradasHoje = dailyIncomes?.reduce((acc, op) => acc + op.value, 0) ?? 0;
   const gastosHoje = dailyExpenses?.reduce((acc, op) => acc + op.value, 0) ?? 0;
   const totalFluxoDiario = entradasHoje + gastosHoje;
 
-  // Lógica do Gráfico - Restaurada a lógica original de filtragem por data local
   const chartData = useMemo(() => {
     if (!todasOperacoes || todasOperacoes.length === 0) return [];
     const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -120,7 +117,8 @@ export default function DashboardCincoPila() {
     return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-[#172c3c]">CARREGANDO...</div>;
   }
 
-  const [saldoInteiro, saldoCentavos] = saldoAtual.toLocaleString("pt-BR", { minimumFractionDigits: 2 }).split(",");
+  const saldoFormatado = (saldoAtual ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  const [saldoInteiro, saldoCentavos] = saldoFormatado.split(",");
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans pb-32">
@@ -193,11 +191,11 @@ export default function DashboardCincoPila() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-3">
                   <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Zap size={12} className="text-[#e6b33d]"/> Limites</p>
-                  <AutoCarousel>{limits?.map((l, idx) => <DashBoardLimit key={l.id} l={l} index={idx} />)}</AutoCarousel>
+                  <AutoCarousel>{limits?.map((l: any, idx: number) => <DashBoardLimit key={l.id} l={l} index={idx} />)}</AutoCarousel>
                </div>
                <div className="space-y-3">
                   <p className="px-4 text-[9px] font-black uppercase opacity-30 italic flex items-center gap-2"><Target size={12} className="text-[#d96831]"/> Metas</p>
-                  <AutoCarousel>{goals?.map(g => <MetasDashboard key={g.id} goal={g} />)}</AutoCarousel>
+                  <AutoCarousel>{goals?.map((g: any) => <MetasDashboard key={g.id} goal={g} />)}</AutoCarousel>
                </div>
             </div>
           </div>
@@ -220,7 +218,7 @@ export default function DashboardCincoPila() {
             <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl">
               <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Recentes</h3>
               <div className="space-y-3">
-                {todasOperacoes?.slice(0, 5).map((op) => (
+                {todasOperacoes?.slice(0, 5).map((op: any) => (
                   <div key={op.id} className="flex justify-between items-center border-b border-white/5 pb-2">
                     <p className="text-[9px] font-black uppercase truncate w-24 italic leading-none">{op.title}</p>
                     <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>
