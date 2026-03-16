@@ -26,14 +26,14 @@ export const operacoesRouter = createTRPCRouter({
 
 
     create: protectedProcedure
-        .input(z.object({ title: z.string().min(1), tagId: z.string().min(1).optional(), description: z.string().min(1), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
+        .input(z.object({ title: z.string().min(1), tagId: z.string().optional(), description: z.string().optional(), value: z.number(), type: z.enum(["INCOME", "EXPENSE"]) }))
         .mutation(async ({ ctx, input }) => {
             return ctx.db.transaction.create({
                 data: {
                     title: input.title,
-                    description: input.description,
+                    description: input.description ?? "",
                     value: input.value,
-                    tag: { connect: { id: input.tagId } },
+                    tag: input.tagId ? { connect: { id: input.tagId } } : undefined,
                     type: input.type,
                     user: { connect: { id: ctx.session.user.id } },
                 },

@@ -64,7 +64,7 @@ export default function GestaoFinanceira() {
     return transactions.filter(item => item.tagId && selectedTagIds.includes(item.tagId));
   }, [transactions, selectedTagIds]);
 
-  // --- CÁLCULOS (Dashboards fixos no total geral) ---
+  // --- CÁLCULOS ---
   const totals = useMemo(() => {
     return transactions.reduce((acc, curr) => {
       if (curr.type === 'INCOME') acc.income += curr.value;
@@ -93,7 +93,15 @@ export default function GestaoFinanceira() {
     e.preventDefault();
     const finalValue = parseFloat(opValueInput.replace(',', '.'));
     if (isNaN(finalValue)) return alert("Valor inválido");
-    const payload = { ...opFormData, value: finalValue };
+    
+    // Tratando tagId e description como opcionais (envia undefined se vazio)
+    const payload = { 
+      ...opFormData, 
+      value: finalValue,
+      tagId: opFormData.tagId || undefined,
+      description: opFormData.description || undefined
+    };
+
     if (editingOpId) updateOp.mutate({ id: editingOpId, ...payload });
     else createOp.mutate(payload);
   };
@@ -250,101 +258,81 @@ export default function GestaoFinanceira() {
         </div>
       </div>
 
-     {/* --- MODAL OPERAÇÃO --- */}
-{isOpModalOpen && (
-  <div className="modal modal-open backdrop-blur-sm p-4">
-    <div className="modal-box bg-white border-4 border-[#172c3c] rounded-[3rem] p-8 max-w-lg w-full">
-      {/* Título centralizado na grid */}
-      <div className="grid grid-cols-6 gap-4 mb-8">
-        <h3 className="font-black text-2xl col-span-6 text-center md:text-3xl italic uppercase text-[#172c3c]">
-          {editingOpId ? 'Ajustar Registro' : 'Lançar no Caixa'}
-        </h3>
-      </div>
+      {/* --- MODAL OPERAÇÃO (COM CAMPOS OPCIONAIS) --- */}
+      {isOpModalOpen && (
+        <div className="modal modal-open backdrop-blur-sm p-4">
+          <div className="modal-box bg-white border-4 border-[#172c3c] rounded-[3rem] p-8 max-w-lg w-full">
+            <h3 className="font-black text-2xl text-center mb-8 italic uppercase text-[#172c3c]">
+              {editingOpId ? 'Ajustar Registro' : 'Lançar no Caixa'}
+            </h3>
 
-      <form onSubmit={handleSaveOp} className="grid grid-cols-6 gap-x-4 gap-y-2 md:gap-y-4">
-        {/* Título: Ocupa tudo */}
-        <div className="form-control col-span-6">
-          <label className="label uppercase font-black text-[10px] opacity-40">Título</label>
-          <input 
-            type="text" 
-            required 
-            className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-bold bg-[#f0f2f5] w-full" 
-            value={opFormData.title} 
-            onChange={e => setOpFormData({ ...opFormData, title: e.target.value })} 
-          />
-        </div>
+            <form onSubmit={handleSaveOp} className="grid grid-cols-6 gap-x-4 gap-y-4">
+              <div className="form-control col-span-6">
+                <label className="label uppercase font-black text-[10px] opacity-40">Título</label>
+                <input 
+                  type="text" 
+                  required 
+                  className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-bold bg-[#f0f2f5] w-full" 
+                  value={opFormData.title} 
+                  onChange={e => setOpFormData({ ...opFormData, title: e.target.value })} 
+                />
+              </div>
 
-        {/* Valor: Metade */}
-        <div className="form-control col-span-3">
-          <label className="label uppercase font-black text-[10px] opacity-40">Valor (R$)</label>
-          <input 
-            type="text" 
-            inputMode="decimal" 
-            required 
-            className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
-            value={opValueInput} 
-            onChange={e => setOpValueInput(e.target.value.replace(/[^0-9.,]/g, ""))} 
-          />
-        </div>
+              <div className="form-control col-span-3">
+                <label className="label uppercase font-black text-[10px] opacity-40">Valor (R$)</label>
+                <input 
+                  type="text" 
+                  inputMode="decimal" 
+                  required 
+                  className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
+                  value={opValueInput} 
+                  onChange={e => setOpValueInput(e.target.value.replace(/[^0-9.,]/g, ""))} 
+                />
+              </div>
 
-        {/* Tipo: Metade */}
-        <div className="form-control col-span-3">
-          <label className="label uppercase font-black text-[10px] opacity-40">Tipo</label>
-          <select 
-            className="select select-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
-            value={opFormData.type} 
-            onChange={e => setOpFormData({ ...opFormData, type: e.target.value as any })}
-          >
-            <option value="EXPENSE">SAÍDA (-)</option>
-            <option value="INCOME">ENTRADA (+)</option>
-          </select>
-        </div>
+              <div className="form-control col-span-3">
+                <label className="label uppercase font-black text-[10px] opacity-40">Tipo</label>
+                <select 
+                  className="select select-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
+                  value={opFormData.type} 
+                  onChange={e => setOpFormData({ ...opFormData, type: e.target.value as any })}
+                >
+                  <option value="EXPENSE">SAÍDA (-)</option>
+                  <option value="INCOME">ENTRADA (+)</option>
+                </select>
+              </div>
 
-        {/* Tag: Ocupa tudo */}
-        <div className="form-control col-span-6">
-          <label className="label uppercase font-black text-[10px] opacity-40">Etiqueta (Tag)</label>
-          <select 
-            className="select select-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
-            value={opFormData.tagId} 
-            onChange={e => setOpFormData({ ...opFormData, tagId: e.target.value })}
-          >
-            <option value="">Nenhuma Tag</option>
-            {tags.map(tag => <option key={tag.id} value={tag.id}>{tag.name.toUpperCase()}</option>)}
-          </select>
-        </div>
+              <div className="form-control col-span-6">
+                <label className="label uppercase font-black text-[10px] opacity-40 italic">Etiqueta (Tag) - Opcional</label>
+                <select 
+                  className="select select-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
+                  value={opFormData.tagId} 
+                  onChange={e => setOpFormData({ ...opFormData, tagId: e.target.value })}
+                >
+                  <option value="">Nenhuma Tag</option>
+                  {tags.map(tag => <option key={tag.id} value={tag.id}>{tag.name.toUpperCase()}</option>)}
+                </select>
+              </div>
 
-        {/* Descrição: Ocupa tudo */}
-        <div className="form-control col-span-6">
-          <label className="label uppercase font-black text-[10px] opacity-40">Descrição</label>
-          <input 
-            type="text" 
-            required 
-            className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-bold bg-[#f0f2f5] w-full" 
-            value={opFormData.description} 
-            onChange={e => setOpFormData({ ...opFormData, description: e.target.value })} 
-          />
-        </div>
+              <div className="form-control col-span-6">
+                <label className="label uppercase font-black text-[10px] opacity-40 italic">Descrição - Opcional</label>
+                <input 
+                  type="text" 
+                  placeholder="Ex: Nota fiscal, Pix para João..."
+                  className="input input-bordered border-2 border-[#172c3c] rounded-2xl font-bold bg-[#f0f2f5] w-full" 
+                  value={opFormData.description} 
+                  onChange={e => setOpFormData({ ...opFormData, description: e.target.value })} 
+                />
+              </div>
 
-        {/* Ações: Ocupa tudo */}
-        <div className="col-span-6 flex flex-col md:flex-row gap-2 mt-6">
-          <button 
-            type="button" 
-            onClick={() => setIsOpModalOpen(false)} 
-            className="btn btn-ghost font-black opacity-30 order-2 md:order-1"
-          >
-            FECHAR
-          </button>
-          <button 
-            type="submit" 
-            className="btn bg-[#172c3c] text-white border-none rounded-2xl px-10 font-black flex-1 order-1 md:order-2 uppercase"
-          >
-            Confirmar
-          </button>
+              <div className="col-span-6 flex flex-col md:flex-row gap-2 mt-6">
+                <button type="button" onClick={() => setIsOpModalOpen(false)} className="btn btn-ghost font-black opacity-30 order-2 md:order-1">FECHAR</button>
+                <button type="submit" className="btn bg-[#172c3c] text-white border-none rounded-2xl px-10 font-black flex-1 order-1 md:order-2 uppercase">Confirmar</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
       {/* --- MODAL TAGS --- */}
       {isTagModalOpen && (
