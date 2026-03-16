@@ -8,12 +8,13 @@ import {
 
 export const metasRouter = createTRPCRouter({
     create: protectedProcedure
-        .input(z.object({ title: z.string().min(1), targetAmount: z.number(), currentAmount: z.number(), deadline: z.date().optional() }))
+        .input(z.object({ title: z.string().min(1), targetAmount: z.number(), color: z.string().optional(), currentAmount: z.number(), deadline: z.date().optional() }))
         .mutation(async ({ ctx, input }) => {
             return ctx.db.goal.create({
                 data: {
                     title: input.title,
                     targetAmount: input.targetAmount,
+                    color: input.color,
                     currentAmount: input.currentAmount,
                     deadline: input.deadline,
                     user: { connect: { id: ctx.session.user.id } },
@@ -21,7 +22,7 @@ export const metasRouter = createTRPCRouter({
             });
         }),
     update: protectedProcedure
-    .input(z.object({ id: z.string().min(1), title: z.string().min(1), targetAmount: z.number(), currentAmount: z.number(), deadline: z.date().optional() }))
+    .input(z.object({ id: z.string().min(1), title: z.string().min(1), color: z.string().optional(), targetAmount: z.number(), currentAmount: z.number(), deadline: z.date().optional() }))
     .mutation(async ({ ctx, input }) => {
         return ctx.db.goal.update({
             where: { id: input.id },
@@ -29,6 +30,7 @@ export const metasRouter = createTRPCRouter({
                 title: input.title,
                 targetAmount: input.targetAmount,
                 currentAmount: input.currentAmount,
+                color: input.color,
                 deadline: input.deadline,
             },
         });

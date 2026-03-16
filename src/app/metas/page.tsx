@@ -8,9 +8,12 @@ interface GoalFormData {
   id?: string;
   title: string;
   currentAmount: number;
+  color: string;
   targetAmount: number;
   deadline?: string; // Formato YYYY-MM-DD para o input
 }
+const PALETTE = ["#172c3c", "#274862", "#995052", "#d96831", "#e6b33d"];
+
 
 export default function MetasCincoPila() {
   const [activeTab, setActiveTab] = useState<Tab>('goals');
@@ -41,7 +44,7 @@ export default function MetasCincoPila() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<GoalFormData>({
-    title: '', currentAmount: 0, targetAmount: 0, deadline: ''
+    title: '', currentAmount: 0, targetAmount: 0, deadline: '', color: '#ffffffff'
   });
 
   // --- HANDLERS ---
@@ -51,12 +54,13 @@ export default function MetasCincoPila() {
       setFormData({
         title: goal.title,
         currentAmount: goal.currentAmount,
+        color: goal.color,
         targetAmount: goal.targetAmount,
         deadline: goal.deadline ? new Date(goal.deadline).toISOString().split('T')[0] : '',
       });
     } else {
       setEditingId(null);
-      setFormData({ title: '', currentAmount: 0, targetAmount: 0, deadline: '' });
+      setFormData({ title: '', currentAmount: 0, targetAmount: 0, deadline: '', color: '#ffffffff' });
     }
     setIsModalOpen(true);
   };
@@ -67,6 +71,7 @@ export default function MetasCincoPila() {
       title: formData.title,
       currentAmount: formData.currentAmount,
       targetAmount: formData.targetAmount,
+      color: formData.color,
       deadline: formData.deadline ? new Date(formData.deadline) : undefined,
     };
 
@@ -116,67 +121,81 @@ export default function MetasCincoPila() {
 
             return (
               <div 
-                key={goal.id} 
-                style={{ animationDelay: `${index * 100}ms` }}
-                className={`
-                  group relative bg-[#172c3c] rounded-[3rem] p-8 text-white overflow-hidden shadow-2xl transition-all duration-500 animate-in zoom-in-95
-                  ${isNearTarget ? 'ring-4 ring-[#e6b33d] ring-offset-4 ring-offset-[#f0f2f5] animate-pulse-slow' : ''}
-                `}
-              >
-                {/* Alerta Pulsante */}
-                {isNearTarget && (
-                  <div className="absolute top-6 left-8 flex items-center gap-2 z-20">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e6b33d] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#e6b33d]"></span>
-                    </span>
-                    <span className="text-[8px] font-black uppercase text-[#e6b33d]">Tá batendo!</span>
-                  </div>
-                )}
+  key={goal.id} 
+  style={{ 
+    animationDelay: `${index * 100}ms`, 
+    backgroundColor: goal.color || "#172c3c" // Fallback para a cor padrão se estiver vazio
+  }}
+  className={`
+    group relative rounded-[3rem] p-8 text-white overflow-hidden shadow-2xl transition-all duration-500 animate-in zoom-in-95
+    ${isNearTarget ? 'ring-4 ring-white ring-offset-4 ring-offset-[#f0f2f5] animate-pulse-slow' : ''}
+  `}
+>
+  {/* Alerta Pulsante - Agora em branco para contrastar com qualquer cor de fundo */}
+  {isNearTarget && (
+    <div className="absolute top-6 left-8 flex items-center gap-2 z-20">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+      </span>
+      <span className="text-[8px] font-black uppercase text-white">Tá batendo!</span>
+    </div>
+  )}
 
-                <div className="absolute top-8 right-8 w-20 h-20 rounded-full border-2 border-white/10 flex items-center justify-center">
-                  <span className="text-2xl font-black italic">{percent}%</span>
-                </div>
+  {/* Círculo de Percentual - Borda branca com baixa opacidade */}
+  <div className="absolute top-8 right-8 w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center">
+    <span className="text-2xl font-black italic">{percent}%</span>
+  </div>
 
-                <div className="relative z-10">
-                  <p className="text-[10px] font-black opacity-40 mb-1 mt-4 italic">
-                    {goal.deadline ? new Date(goal.deadline).toLocaleDateString('pt-BR') : 'Sem prazo'}
-                  </p>
-                  <h3 className="text-3xl font-black leading-tight mb-8 group-hover:text-[#e6b33d] transition-colors truncate">
-                    {goal.title}
-                  </h3>
+  <div className="relative z-10">
+    <p className="text-[10px] font-black opacity-60 mb-1 mt-4 italic">
+      {goal.deadline ? new Date(goal.deadline).toLocaleDateString('pt-BR') : 'Sem prazo'}
+    </p>
+    <h3 className="text-3xl font-black leading-tight mb-8 transition-colors truncate">
+      {goal.title}
+    </h3>
 
-                  <div className="space-y-6">
-                    <div className="relative h-28 w-full bg-white/5 rounded-3xl p-5 flex flex-col justify-end overflow-hidden border border-white/5">
-                      <div 
-                        className="absolute bottom-0 left-0 w-full transition-all duration-1000 ease-out bg-[#e6b33d]" 
-                        style={{ height: `${percent}%`, opacity: 0.2 }}
-                      />
-                      <p className="text-[10px] font-black opacity-40 mb-1 uppercase">Progresso</p>
-                      <p className="text-2xl font-black italic">
-                        R$ {goal.currentAmount.toLocaleString()} <span className="text-[10px] opacity-30 font-normal">/ {goal.targetAmount.toLocaleString()}</span>
-                      </p>
-                    </div>
+    <div className="space-y-6">
+      {/* Container de Progresso - Fundo branco bem clarinho para destacar a cor de fundo */}
+      <div className="relative h-28 w-full bg-white/10 rounded-3xl p-5 flex flex-col justify-end overflow-hidden border border-white/10">
+        {/* Barra de Progresso Interna - Usamos branco com opacidade para preencher */}
+        <div 
+          className="absolute bottom-0 left-0 w-full transition-all duration-1000 ease-out bg-white" 
+          style={{ height: `${percent}%`, opacity: 0.25 }}
+        />
+        
+        <p className="text-[10px] font-black opacity-60 mb-1 uppercase">Progresso</p>
+        <p className="text-2xl font-black italic">
+          R$ {goal.currentAmount.toLocaleString()} 
+          <span className="text-[10px] opacity-40 font-normal ml-1">
+            / {goal.targetAmount.toLocaleString()}
+          </span>
+        </p>
+      </div>
 
-                    <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                      <button 
-                        onClick={() => handleOpenModal(goal)}
-                        className="btn btn-sm flex-1 bg-white/10 border-none text-white rounded-xl hover:bg-white hover:text-[#172c3c] font-black text-[10px]"
-                      >
-                        AJUSTAR
-                      </button>
-                      <button 
-                        onClick={() => {
-                            if(confirm("Apagar?")) deleteGoal.mutate({ id: goal.id });
-                        }}
-                        className="btn btn-sm bg-[#995052]/20 border-none text-[#995052] rounded-xl hover:bg-[#995052] hover:text-white"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {/* Ações que aparecem no Hover */}
+      <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+        <button 
+          onClick={() => handleOpenModal(goal)}
+          className="btn btn-sm flex-1 bg-white/20 border-none text-white rounded-xl hover:bg-white hover:text-black font-black text-[10px]"
+        >
+          AJUSTAR
+        </button>
+        <button 
+          onClick={() => {
+              if(confirm("Apagar?")) deleteGoal.mutate({ id: goal.id });
+          }}
+          className="btn btn-sm bg-black/20 border-none text-white rounded-xl hover:bg-red-600 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Efeito de brilho sutil no fundo para dar profundidade à cor */}
+  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+</div>
             );
           })}
         </div>
@@ -237,6 +256,20 @@ export default function MetasCincoPila() {
       onChange={e => setFormData({...formData, deadline: e.target.value})}
     />
   </div>
+  
+  {/* Corzinha */}
+  <div className="form-control col-span-6">
+                  <label className="label uppercase font-black text-[10px] opacity-40">Cor (Paleta ou Seletor)</label>
+                  <div className="flex items-center gap-3 bg-white p-2 rounded-xl border-2 border-[#172c3c]/10">
+                    <div className="flex gap-1 flex-wrap">
+                      {PALETTE.map(color => (
+                        <button key={color} type="button" onClick={() => setFormData({ ...formData, color })} className={`w-7 h-7 rounded-full border-2 transition-transform ${formData.color === color ? 'border-[#172c3c] scale-110 shadow-sm' : 'border-transparent'}`} style={{ backgroundColor: color }} />
+                      ))}
+                    </div>
+                    <div className="divider divider-horizontal mx-15"></div>
+                    <input type="color" className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-none p-0" value={formData.color} onChange={e => setFormData({ ...formData, color: e.target.value })} />
+                  </div>
+                </div>
 
   {/* Ações: Ocupa tudo */}
   <div className="col-span-6 flex flex-col gap-2 mt-4">
