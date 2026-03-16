@@ -56,9 +56,9 @@ export const operacoesRouter = createTRPCRouter({
                 where: { id: input.id },
                 data: {
                     title: input.title,
-                    description: input.description,
+                    description: input.description ?? "",
                     value: input.value,
-                    tag: { connect: { id: input.tagId } },
+                    tag: input.tagId ? { connect: { id: input.tagId } } : undefined,
                     type: input.type,
                 },
             });
