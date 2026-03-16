@@ -10,20 +10,60 @@ import {
 import ReactMarkdown from "react-markdown";
 import { format, isToday } from "date-fns";
 import dynamic from "next/dynamic";
-
-// --- IMPORTS DINÂMICOS DO RECHARTS (RESOLVE ERRO DE HIDRATAÇÃO) ---
-const ResponsiveContainer = dynamic(() => import("recharts").then(m => m.ResponsiveContainer), { ssr: false });
-const BarChart = dynamic(() => import("recharts").then(m => m.BarChart), { ssr: false });
-const Bar = dynamic(() => import("recharts").then(m => m.Bar), { ssr: false });
-const XAxis = dynamic(() => import("recharts").then(m => m.XAxis), { ssr: false });
-const Tooltip = dynamic(() => import("recharts").then(m => m.Tooltip), { ssr: false });
-const Cell = dynamic(() => import("recharts").then(m => m.Cell), { ssr: false });
-
 import FloatingNav, { type Tab } from "../_components/FloatingNav";
 import DashBoardLimit from "../_components/DashBoardLimit";
 import MetasDashboard from "../_components/MetasDashboard";
 
-// --- CARROSSEL ORIGINAL ---
+// --- COMPONENTE DE GRÁFICO (PROTEÇÃO TOTAL CONTRA ERROS DE DEPLOY) ---
+const ChartContainer = dynamic(() => import("recharts").then((re) => {
+  const { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } = re;
+  
+  const InternalChart = ({ data }: { data: any[] }) => {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+          <XAxis 
+            dataKey="name" 
+            axisLine={false} 
+            tickLine={false} 
+            tick={{ fontSize: 10, fontWeight: 900, fill: "#172c3c", opacity: 0.3 }} 
+          />
+          <Tooltip 
+            cursor={{ fill: "#f0f2f5", radius: 10 }} 
+            content={({ active, payload }) => {
+              if (active && payload?.[0]) {
+                const value = payload[0].value;
+                return (
+                  <div className="bg-[#172c3c] px-3 py-2 rounded-xl shadow-xl border border-white/10">
+                    <p className="text-[10px] font-black text-[#e6b33d] uppercase mb-1">Gasto Mensal</p>
+                    <p className="text-white font-black text-xs">R$ {Number(value).toLocaleString("pt-BR")}</p>
+                  </div>
+                );
+              }
+              return null;
+            }} 
+          />
+          <Bar dataKey="value" radius={[10, 10, 10, 10]} barSize={32}>
+            {data.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={entry.isAtual ? "#d96831" : "#172c3c"} 
+                fillOpacity={entry.isAtual ? 1 : 0.08} 
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  };
+
+  return { default: InternalChart };
+}), { 
+  ssr: false, 
+  loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-[2rem]" /> 
+});
+
+// --- CARROSSEL ---
 const AutoCarousel = ({ children, autoScrollSpeed = 5000, step = 340 }: { children: React.ReactNode, autoScrollSpeed?: number, step?: number }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -69,7 +109,7 @@ export default function DashboardCincoPila() {
 
   const isReady = mounted && status === "authenticated";
 
-  // Queries - Usando a base de dados principal
+  // Queries
   const { data: todasOperacoes } = api.operacoes.getAll.useQuery(undefined, { enabled: isReady });
   const { data: saldoAtual = 0 } = api.operacoes.saldoAtual.useQuery(undefined, { enabled: isReady });
   const { data: limits = [] } = api.limites.getAll.useQuery(undefined, { enabled: isReady });
@@ -80,7 +120,7 @@ export default function DashboardCincoPila() {
     onSuccess: () => { void utils.avisos.getAll.invalidate(); }
   });
 
-  // --- LÓGICA DO BALANÇO DE HOJE (RESTAURADA) ---
+  // Lógica do Balanço
   const balancoHoje = useMemo(() => {
     if (!todasOperacoes) return { entradas: 0, gastos: 0, total: 0 };
     const opsHoje = todasOperacoes.filter(op => isToday(new Date(op.createdAt)));
@@ -89,26 +129,23 @@ export default function DashboardCincoPila() {
     return { entradas, gastos, total: entradas + gastos };
   }, [todasOperacoes]);
 
-  // --- LÓGICA DO GRÁFICO SEMESTRAL (RESTAURADA) ---
+  // Lógica do Gráfico
   const chartData = useMemo(() => {
     if (!todasOperacoes || todasOperacoes.length === 0) return [];
-    const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const mesesNomes = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
     const hoje = new Date();
     
     return Array.from({ length: 6 }).map((_, i) => {
       const d = new Date(hoje.getFullYear(), hoje.getMonth() - (5 - i), 1);
-      const mesRef = d.getMonth();
-      const anoRef = d.getFullYear();
-
       const totalGasto = todasOperacoes
         .filter((op) => {
           const opDate = new Date(op.createdAt);
-          return op.type === "EXPENSE" && opDate.getMonth() === mesRef && opDate.getFullYear() === anoRef;
+          return op.type === "EXPENSE" && opDate.getMonth() === d.getMonth() && opDate.getFullYear() === d.getFullYear();
         })
         .reduce((acc, curr) => acc + curr.value, 0);
 
       return { 
-        name: mesesNomes[mesRef] ?? "---", 
+        name: mesesNomes[d.getMonth()] ?? "---", 
         value: totalGasto, 
         isAtual: i === 5 
       };
@@ -119,7 +156,8 @@ export default function DashboardCincoPila() {
     return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-[#172c3c]">CARREGANDO...</div>;
   }
 
-  const [saldoInteiro, saldoCentavos] = saldoAtual.toLocaleString("pt-BR", { minimumFractionDigits: 2 }).split(",");
+  const saldoFormatado = (saldoAtual ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  const [saldoInteiro, saldoCentavos] = saldoFormatado.split(",");
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#172c3c] font-sans pb-32">
@@ -127,7 +165,7 @@ export default function DashboardCincoPila() {
       <div className="h-2 w-full bg-gradient-to-r from-[#172c3c] via-[#d96831] to-[#e6b33d] sticky top-0 z-[60]" />
 
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6">
-        {/* PATRIMÔNIO CENTRAL */}
+        
         <div className="flex flex-col items-center mb-10 text-center">
           <p className="text-[10px] font-black uppercase tracking-[0.6em] mb-2 opacity-30 italic">Patrimônio Consolidado</p>
           <div className="flex items-baseline gap-2">
@@ -139,7 +177,6 @@ export default function DashboardCincoPila() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* COLUNA ESQUERDA */}
           <div className="lg:col-span-3 space-y-6">
              <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-black/5">
                 <p className="text-[10px] font-black opacity-30 uppercase mb-4 italic">Balanço de Hoje</p>
@@ -179,29 +216,17 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* COLUNA CENTRAL */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5">
-              <h3 className="text-xs font-black uppercase italic mb-8 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral</h3>
+            <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-black/5 relative overflow-hidden">
+              <h3 className="text-xs font-black uppercase italic mb-8 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-[#d96831]" /> Fluxo Semestral
+              </h3>
               <div className="h-[300px] w-full">
                 {chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: "#172c3c", opacity: 0.4 }} />
-                      <Tooltip cursor={{ fill: "#172c3c", fillOpacity: 0.05 }} content={({ active, payload }) => {
-                        if (active && payload?.[0]) return <div className="bg-[#172c3c] p-2 rounded-lg text-white font-black text-[10px]">R$ {Number(payload[0].value).toLocaleString("pt-BR")}</div>;
-                        return null;
-                      }} />
-                      <Bar dataKey="value" radius={[6, 6, 6, 6]} barSize={35}>
-                        {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.isAtual ? "#d96831" : "#172c3c"} fillOpacity={entry.isAtual ? 1 : 0.1} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <ChartContainer data={chartData} />
                 ) : (
-                  <div className="h-full flex items-center justify-center opacity-10">
-                    <p className="text-[10px] font-black uppercase italic">Sem histórico detectado</p>
+                  <div className="h-full flex items-center justify-center border-2 border-dashed border-slate-100 rounded-[2rem] opacity-20">
+                    <p className="text-[10px] font-black uppercase italic">Sem dados históricos</p>
                   </div>
                 )}
               </div>
@@ -219,7 +244,6 @@ export default function DashboardCincoPila() {
             </div>
           </div>
 
-          {/* COLUNA DIREITA */}
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white rounded-[2.5rem] shadow-xl border-2 border-[#172c3c]/5 flex flex-col h-[400px] overflow-hidden">
               <div className="p-4 bg-[#172c3c] text-white flex items-center gap-2">
@@ -239,7 +263,7 @@ export default function DashboardCincoPila() {
             <div className="bg-[#172c3c] rounded-[2.5rem] p-6 text-white shadow-2xl">
               <h3 className="text-[9px] font-black uppercase tracking-widest text-[#e6b33d] mb-4 italic">Recentes</h3>
               <div className="space-y-3">
-                {todasOperacoes?.slice(0, 5).map((op) => (
+                {todasOperacoes?.slice(0, 5).map((op: any) => (
                   <div key={op.id} className="flex justify-between items-center border-b border-white/5 pb-2">
                     <p className="text-[9px] font-black uppercase truncate w-24 italic leading-none">{op.title}</p>
                     <p className={`text-[10px] font-black italic ${op.type === "EXPENSE" ? "text-[#995052]" : "text-emerald-400"}`}>
