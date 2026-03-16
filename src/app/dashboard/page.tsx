@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import { format, isToday } from "date-fns";
 import dynamic from "next/dynamic";
 
+
 // --- COMPONENTE DE GRÁFICO ---
 const ChartContainer = dynamic(() => import("recharts").then((re) => {
   const { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } = re;
@@ -92,7 +93,9 @@ const AutoCarousel = ({ children, autoScrollSpeed = 5000, step = 340 }: { childr
   );
 };
 
+
 export default function DashboardCincoPila() {
+  
   const utils = api.useUtils();
   const { status } = useSession();
   const [mounted, setMounted] = useState(false);
