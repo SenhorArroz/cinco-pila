@@ -103,8 +103,14 @@ model Transaction {
   
   tagId       String?
   tag         TransactionTag? @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  metaId      String?
+  meta        Goal?           @relation(fields: [metaId], references: [id], onDelete: SetNull)
+  limiteId    String?
+  limite      Limit?          @relation(fields: [limiteId], references: [id], onDelete: SetNull)
+
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum TransactionType {
@@ -136,6 +142,7 @@ model Goal {
 
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
 }
 
 model Limit {
@@ -148,6 +155,7 @@ model Limit {
 
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
 }
 
 model CreditCard {

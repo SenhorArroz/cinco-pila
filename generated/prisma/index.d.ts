@@ -1746,6 +1746,68 @@ export namespace Prisma {
 
 
   /**
+   * Count Type GoalCountOutputType
+   */
+
+  export type GoalCountOutputType = {
+    transactions: number
+  }
+
+  export type GoalCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    transactions?: boolean | GoalCountOutputTypeCountTransactionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * GoalCountOutputType without action
+   */
+  export type GoalCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoalCountOutputType
+     */
+    select?: GoalCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * GoalCountOutputType without action
+   */
+  export type GoalCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TransactionWhereInput
+  }
+
+
+  /**
+   * Count Type LimitCountOutputType
+   */
+
+  export type LimitCountOutputType = {
+    transactions: number
+  }
+
+  export type LimitCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    transactions?: boolean | LimitCountOutputTypeCountTransactionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * LimitCountOutputType without action
+   */
+  export type LimitCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LimitCountOutputType
+     */
+    select?: LimitCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * LimitCountOutputType without action
+   */
+  export type LimitCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TransactionWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -6454,6 +6516,8 @@ export namespace Prisma {
     type: $Enums.TransactionType | null
     createdAt: Date | null
     tagId: string | null
+    metaId: string | null
+    limiteId: string | null
     userId: string | null
   }
 
@@ -6466,6 +6530,8 @@ export namespace Prisma {
     type: $Enums.TransactionType | null
     createdAt: Date | null
     tagId: string | null
+    metaId: string | null
+    limiteId: string | null
     userId: string | null
   }
 
@@ -6478,6 +6544,8 @@ export namespace Prisma {
     type: number
     createdAt: number
     tagId: number
+    metaId: number
+    limiteId: number
     userId: number
     _all: number
   }
@@ -6500,6 +6568,8 @@ export namespace Prisma {
     type?: true
     createdAt?: true
     tagId?: true
+    metaId?: true
+    limiteId?: true
     userId?: true
   }
 
@@ -6512,6 +6582,8 @@ export namespace Prisma {
     type?: true
     createdAt?: true
     tagId?: true
+    metaId?: true
+    limiteId?: true
     userId?: true
   }
 
@@ -6524,6 +6596,8 @@ export namespace Prisma {
     type?: true
     createdAt?: true
     tagId?: true
+    metaId?: true
+    limiteId?: true
     userId?: true
     _all?: true
   }
@@ -6623,6 +6697,8 @@ export namespace Prisma {
     type: $Enums.TransactionType
     createdAt: Date
     tagId: string | null
+    metaId: string | null
+    limiteId: string | null
     userId: string
     _count: TransactionCountAggregateOutputType | null
     _avg: TransactionAvgAggregateOutputType | null
@@ -6654,8 +6730,12 @@ export namespace Prisma {
     type?: boolean
     createdAt?: boolean
     tagId?: boolean
+    metaId?: boolean
+    limiteId?: boolean
     userId?: boolean
     tag?: boolean | Transaction$tagArgs<ExtArgs>
+    meta?: boolean | Transaction$metaArgs<ExtArgs>
+    limite?: boolean | Transaction$limiteArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["transaction"]>
 
@@ -6668,8 +6748,12 @@ export namespace Prisma {
     type?: boolean
     createdAt?: boolean
     tagId?: boolean
+    metaId?: boolean
+    limiteId?: boolean
     userId?: boolean
     tag?: boolean | Transaction$tagArgs<ExtArgs>
+    meta?: boolean | Transaction$metaArgs<ExtArgs>
+    limite?: boolean | Transaction$limiteArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["transaction"]>
 
@@ -6682,8 +6766,12 @@ export namespace Prisma {
     type?: boolean
     createdAt?: boolean
     tagId?: boolean
+    metaId?: boolean
+    limiteId?: boolean
     userId?: boolean
     tag?: boolean | Transaction$tagArgs<ExtArgs>
+    meta?: boolean | Transaction$metaArgs<ExtArgs>
+    limite?: boolean | Transaction$limiteArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["transaction"]>
 
@@ -6696,20 +6784,28 @@ export namespace Prisma {
     type?: boolean
     createdAt?: boolean
     tagId?: boolean
+    metaId?: boolean
+    limiteId?: boolean
     userId?: boolean
   }
 
-  export type TransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "value" | "color" | "type" | "createdAt" | "tagId" | "userId", ExtArgs["result"]["transaction"]>
+  export type TransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "value" | "color" | "type" | "createdAt" | "tagId" | "metaId" | "limiteId" | "userId", ExtArgs["result"]["transaction"]>
   export type TransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tag?: boolean | Transaction$tagArgs<ExtArgs>
+    meta?: boolean | Transaction$metaArgs<ExtArgs>
+    limite?: boolean | Transaction$limiteArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type TransactionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tag?: boolean | Transaction$tagArgs<ExtArgs>
+    meta?: boolean | Transaction$metaArgs<ExtArgs>
+    limite?: boolean | Transaction$limiteArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type TransactionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tag?: boolean | Transaction$tagArgs<ExtArgs>
+    meta?: boolean | Transaction$metaArgs<ExtArgs>
+    limite?: boolean | Transaction$limiteArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
@@ -6717,6 +6813,8 @@ export namespace Prisma {
     name: "Transaction"
     objects: {
       tag: Prisma.$TransactionTagPayload<ExtArgs> | null
+      meta: Prisma.$GoalPayload<ExtArgs> | null
+      limite: Prisma.$LimitPayload<ExtArgs> | null
       user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -6728,6 +6826,8 @@ export namespace Prisma {
       type: $Enums.TransactionType
       createdAt: Date
       tagId: string | null
+      metaId: string | null
+      limiteId: string | null
       userId: string
     }, ExtArgs["result"]["transaction"]>
     composites: {}
@@ -7124,6 +7224,8 @@ export namespace Prisma {
   export interface Prisma__TransactionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     tag<T extends Transaction$tagArgs<ExtArgs> = {}>(args?: Subset<T, Transaction$tagArgs<ExtArgs>>): Prisma__TransactionTagClient<$Result.GetResult<Prisma.$TransactionTagPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    meta<T extends Transaction$metaArgs<ExtArgs> = {}>(args?: Subset<T, Transaction$metaArgs<ExtArgs>>): Prisma__GoalClient<$Result.GetResult<Prisma.$GoalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    limite<T extends Transaction$limiteArgs<ExtArgs> = {}>(args?: Subset<T, Transaction$limiteArgs<ExtArgs>>): Prisma__LimitClient<$Result.GetResult<Prisma.$LimitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -7162,6 +7264,8 @@ export namespace Prisma {
     readonly type: FieldRef<"Transaction", 'TransactionType'>
     readonly createdAt: FieldRef<"Transaction", 'DateTime'>
     readonly tagId: FieldRef<"Transaction", 'String'>
+    readonly metaId: FieldRef<"Transaction", 'String'>
+    readonly limiteId: FieldRef<"Transaction", 'String'>
     readonly userId: FieldRef<"Transaction", 'String'>
   }
     
@@ -7575,6 +7679,44 @@ export namespace Prisma {
      */
     include?: TransactionTagInclude<ExtArgs> | null
     where?: TransactionTagWhereInput
+  }
+
+  /**
+   * Transaction.meta
+   */
+  export type Transaction$metaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Goal
+     */
+    select?: GoalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Goal
+     */
+    omit?: GoalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoalInclude<ExtArgs> | null
+    where?: GoalWhereInput
+  }
+
+  /**
+   * Transaction.limite
+   */
+  export type Transaction$limiteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Limit
+     */
+    select?: LimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Limit
+     */
+    omit?: LimitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LimitInclude<ExtArgs> | null
+    where?: LimitWhereInput
   }
 
   /**
@@ -8932,6 +9074,8 @@ export namespace Prisma {
     updatedAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    transactions?: boolean | Goal$transactionsArgs<ExtArgs>
+    _count?: boolean | GoalCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["goal"]>
 
   export type GoalSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8975,6 +9119,8 @@ export namespace Prisma {
   export type GoalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "targetAmount" | "currentAmount" | "deadline" | "color" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["goal"]>
   export type GoalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    transactions?: boolean | Goal$transactionsArgs<ExtArgs>
+    _count?: boolean | GoalCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GoalIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -8987,6 +9133,7 @@ export namespace Prisma {
     name: "Goal"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      transactions: Prisma.$TransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9393,6 +9540,7 @@ export namespace Prisma {
   export interface Prisma__GoalClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    transactions<T extends Goal$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, Goal$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9827,6 +9975,30 @@ export namespace Prisma {
   }
 
   /**
+   * Goal.transactions
+   */
+  export type Goal$transactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transaction
+     */
+    select?: TransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transaction
+     */
+    omit?: TransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransactionInclude<ExtArgs> | null
+    where?: TransactionWhereInput
+    orderBy?: TransactionOrderByWithRelationInput | TransactionOrderByWithRelationInput[]
+    cursor?: TransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TransactionScalarFieldEnum | TransactionScalarFieldEnum[]
+  }
+
+  /**
    * Goal without action
    */
   export type GoalDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10064,6 +10236,8 @@ export namespace Prisma {
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    transactions?: boolean | Limit$transactionsArgs<ExtArgs>
+    _count?: boolean | LimitCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["limit"]>
 
   export type LimitSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -10101,6 +10275,8 @@ export namespace Prisma {
   export type LimitOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "limitAmount" | "currentSpent" | "color" | "createdAt" | "userId", ExtArgs["result"]["limit"]>
   export type LimitInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    transactions?: boolean | Limit$transactionsArgs<ExtArgs>
+    _count?: boolean | LimitCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type LimitIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -10113,6 +10289,7 @@ export namespace Prisma {
     name: "Limit"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      transactions: Prisma.$TransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10517,6 +10694,7 @@ export namespace Prisma {
   export interface Prisma__LimitClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    transactions<T extends Limit$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, Limit$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10946,6 +11124,30 @@ export namespace Prisma {
      * Limit how many Limits to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Limit.transactions
+   */
+  export type Limit$transactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transaction
+     */
+    select?: TransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transaction
+     */
+    omit?: TransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransactionInclude<ExtArgs> | null
+    where?: TransactionWhereInput
+    orderBy?: TransactionOrderByWithRelationInput | TransactionOrderByWithRelationInput[]
+    cursor?: TransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TransactionScalarFieldEnum | TransactionScalarFieldEnum[]
   }
 
   /**
@@ -12143,6 +12345,8 @@ export namespace Prisma {
     type: 'type',
     createdAt: 'createdAt',
     tagId: 'tagId',
+    metaId: 'metaId',
+    limiteId: 'limiteId',
     userId: 'userId'
   };
 
@@ -12660,8 +12864,12 @@ export namespace Prisma {
     type?: EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     tagId?: StringNullableFilter<"Transaction"> | string | null
+    metaId?: StringNullableFilter<"Transaction"> | string | null
+    limiteId?: StringNullableFilter<"Transaction"> | string | null
     userId?: StringFilter<"Transaction"> | string
     tag?: XOR<TransactionTagNullableScalarRelationFilter, TransactionTagWhereInput> | null
+    meta?: XOR<GoalNullableScalarRelationFilter, GoalWhereInput> | null
+    limite?: XOR<LimitNullableScalarRelationFilter, LimitWhereInput> | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -12674,8 +12882,12 @@ export namespace Prisma {
     type?: SortOrder
     createdAt?: SortOrder
     tagId?: SortOrderInput | SortOrder
+    metaId?: SortOrderInput | SortOrder
+    limiteId?: SortOrderInput | SortOrder
     userId?: SortOrder
     tag?: TransactionTagOrderByWithRelationInput
+    meta?: GoalOrderByWithRelationInput
+    limite?: LimitOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
   }
 
@@ -12691,8 +12903,12 @@ export namespace Prisma {
     type?: EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     tagId?: StringNullableFilter<"Transaction"> | string | null
+    metaId?: StringNullableFilter<"Transaction"> | string | null
+    limiteId?: StringNullableFilter<"Transaction"> | string | null
     userId?: StringFilter<"Transaction"> | string
     tag?: XOR<TransactionTagNullableScalarRelationFilter, TransactionTagWhereInput> | null
+    meta?: XOR<GoalNullableScalarRelationFilter, GoalWhereInput> | null
+    limite?: XOR<LimitNullableScalarRelationFilter, LimitWhereInput> | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
@@ -12705,6 +12921,8 @@ export namespace Prisma {
     type?: SortOrder
     createdAt?: SortOrder
     tagId?: SortOrderInput | SortOrder
+    metaId?: SortOrderInput | SortOrder
+    limiteId?: SortOrderInput | SortOrder
     userId?: SortOrder
     _count?: TransactionCountOrderByAggregateInput
     _avg?: TransactionAvgOrderByAggregateInput
@@ -12725,6 +12943,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeWithAggregatesFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeWithAggregatesFilter<"Transaction"> | Date | string
     tagId?: StringNullableWithAggregatesFilter<"Transaction"> | string | null
+    metaId?: StringNullableWithAggregatesFilter<"Transaction"> | string | null
+    limiteId?: StringNullableWithAggregatesFilter<"Transaction"> | string | null
     userId?: StringWithAggregatesFilter<"Transaction"> | string
   }
 
@@ -12805,6 +13025,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Goal"> | Date | string
     userId?: StringFilter<"Goal"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    transactions?: TransactionListRelationFilter
   }
 
   export type GoalOrderByWithRelationInput = {
@@ -12818,6 +13039,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
+    transactions?: TransactionOrderByRelationAggregateInput
   }
 
   export type GoalWhereUniqueInput = Prisma.AtLeast<{
@@ -12834,6 +13056,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Goal"> | Date | string
     userId?: StringFilter<"Goal"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    transactions?: TransactionListRelationFilter
   }, "id">
 
   export type GoalOrderByWithAggregationInput = {
@@ -12880,6 +13103,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Limit"> | Date | string
     userId?: StringFilter<"Limit"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    transactions?: TransactionListRelationFilter
   }
 
   export type LimitOrderByWithRelationInput = {
@@ -12891,6 +13115,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
+    transactions?: TransactionOrderByRelationAggregateInput
   }
 
   export type LimitWhereUniqueInput = Prisma.AtLeast<{
@@ -12905,6 +13130,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Limit"> | Date | string
     userId?: StringFilter<"Limit"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    transactions?: TransactionListRelationFilter
   }, "id">
 
   export type LimitOrderByWithAggregationInput = {
@@ -13345,6 +13571,8 @@ export namespace Prisma {
     type?: $Enums.TransactionType
     createdAt?: Date | string
     tag?: TransactionTagCreateNestedOneWithoutTransactionsInput
+    meta?: GoalCreateNestedOneWithoutTransactionsInput
+    limite?: LimitCreateNestedOneWithoutTransactionsInput
     user: UserCreateNestedOneWithoutTransactionsInput
   }
 
@@ -13357,6 +13585,8 @@ export namespace Prisma {
     type?: $Enums.TransactionType
     createdAt?: Date | string
     tagId?: string | null
+    metaId?: string | null
+    limiteId?: string | null
     userId: string
   }
 
@@ -13369,6 +13599,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tag?: TransactionTagUpdateOneWithoutTransactionsNestedInput
+    meta?: GoalUpdateOneWithoutTransactionsNestedInput
+    limite?: LimitUpdateOneWithoutTransactionsNestedInput
     user?: UserUpdateOneRequiredWithoutTransactionsNestedInput
   }
 
@@ -13381,6 +13613,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -13393,6 +13627,8 @@ export namespace Prisma {
     type?: $Enums.TransactionType
     createdAt?: Date | string
     tagId?: string | null
+    metaId?: string | null
+    limiteId?: string | null
     userId: string
   }
 
@@ -13415,6 +13651,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -13494,6 +13732,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutGoalsInput
+    transactions?: TransactionCreateNestedManyWithoutMetaInput
   }
 
   export type GoalUncheckedCreateInput = {
@@ -13506,6 +13745,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
+    transactions?: TransactionUncheckedCreateNestedManyWithoutMetaInput
   }
 
   export type GoalUpdateInput = {
@@ -13518,6 +13758,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutGoalsNestedInput
+    transactions?: TransactionUpdateManyWithoutMetaNestedInput
   }
 
   export type GoalUncheckedUpdateInput = {
@@ -13530,6 +13771,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    transactions?: TransactionUncheckedUpdateManyWithoutMetaNestedInput
   }
 
   export type GoalCreateManyInput = {
@@ -13575,6 +13817,7 @@ export namespace Prisma {
     color?: string
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutLimitsInput
+    transactions?: TransactionCreateNestedManyWithoutLimiteInput
   }
 
   export type LimitUncheckedCreateInput = {
@@ -13585,6 +13828,7 @@ export namespace Prisma {
     color?: string
     createdAt?: Date | string
     userId: string
+    transactions?: TransactionUncheckedCreateNestedManyWithoutLimiteInput
   }
 
   export type LimitUpdateInput = {
@@ -13595,6 +13839,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutLimitsNestedInput
+    transactions?: TransactionUpdateManyWithoutLimiteNestedInput
   }
 
   export type LimitUncheckedUpdateInput = {
@@ -13605,6 +13850,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    transactions?: TransactionUncheckedUpdateManyWithoutLimiteNestedInput
   }
 
   export type LimitCreateManyInput = {
@@ -14163,6 +14409,16 @@ export namespace Prisma {
     isNot?: TransactionTagWhereInput | null
   }
 
+  export type GoalNullableScalarRelationFilter = {
+    is?: GoalWhereInput | null
+    isNot?: GoalWhereInput | null
+  }
+
+  export type LimitNullableScalarRelationFilter = {
+    is?: LimitWhereInput | null
+    isNot?: LimitWhereInput | null
+  }
+
   export type TransactionCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
@@ -14172,6 +14428,8 @@ export namespace Prisma {
     type?: SortOrder
     createdAt?: SortOrder
     tagId?: SortOrder
+    metaId?: SortOrder
+    limiteId?: SortOrder
     userId?: SortOrder
   }
 
@@ -14188,6 +14446,8 @@ export namespace Prisma {
     type?: SortOrder
     createdAt?: SortOrder
     tagId?: SortOrder
+    metaId?: SortOrder
+    limiteId?: SortOrder
     userId?: SortOrder
   }
 
@@ -14200,6 +14460,8 @@ export namespace Prisma {
     type?: SortOrder
     createdAt?: SortOrder
     tagId?: SortOrder
+    metaId?: SortOrder
+    limiteId?: SortOrder
     userId?: SortOrder
   }
 
@@ -14782,6 +15044,18 @@ export namespace Prisma {
     connect?: TransactionTagWhereUniqueInput
   }
 
+  export type GoalCreateNestedOneWithoutTransactionsInput = {
+    create?: XOR<GoalCreateWithoutTransactionsInput, GoalUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: GoalCreateOrConnectWithoutTransactionsInput
+    connect?: GoalWhereUniqueInput
+  }
+
+  export type LimitCreateNestedOneWithoutTransactionsInput = {
+    create?: XOR<LimitCreateWithoutTransactionsInput, LimitUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: LimitCreateOrConnectWithoutTransactionsInput
+    connect?: LimitWhereUniqueInput
+  }
+
   export type UserCreateNestedOneWithoutTransactionsInput = {
     create?: XOR<UserCreateWithoutTransactionsInput, UserUncheckedCreateWithoutTransactionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutTransactionsInput
@@ -14800,6 +15074,26 @@ export namespace Prisma {
     delete?: TransactionTagWhereInput | boolean
     connect?: TransactionTagWhereUniqueInput
     update?: XOR<XOR<TransactionTagUpdateToOneWithWhereWithoutTransactionsInput, TransactionTagUpdateWithoutTransactionsInput>, TransactionTagUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type GoalUpdateOneWithoutTransactionsNestedInput = {
+    create?: XOR<GoalCreateWithoutTransactionsInput, GoalUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: GoalCreateOrConnectWithoutTransactionsInput
+    upsert?: GoalUpsertWithoutTransactionsInput
+    disconnect?: GoalWhereInput | boolean
+    delete?: GoalWhereInput | boolean
+    connect?: GoalWhereUniqueInput
+    update?: XOR<XOR<GoalUpdateToOneWithWhereWithoutTransactionsInput, GoalUpdateWithoutTransactionsInput>, GoalUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type LimitUpdateOneWithoutTransactionsNestedInput = {
+    create?: XOR<LimitCreateWithoutTransactionsInput, LimitUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: LimitCreateOrConnectWithoutTransactionsInput
+    upsert?: LimitUpsertWithoutTransactionsInput
+    disconnect?: LimitWhereInput | boolean
+    delete?: LimitWhereInput | boolean
+    connect?: LimitWhereUniqueInput
+    update?: XOR<XOR<LimitUpdateToOneWithWhereWithoutTransactionsInput, LimitUpdateWithoutTransactionsInput>, LimitUncheckedUpdateWithoutTransactionsInput>
   }
 
   export type UserUpdateOneRequiredWithoutTransactionsNestedInput = {
@@ -14872,6 +15166,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type TransactionCreateNestedManyWithoutMetaInput = {
+    create?: XOR<TransactionCreateWithoutMetaInput, TransactionUncheckedCreateWithoutMetaInput> | TransactionCreateWithoutMetaInput[] | TransactionUncheckedCreateWithoutMetaInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutMetaInput | TransactionCreateOrConnectWithoutMetaInput[]
+    createMany?: TransactionCreateManyMetaInputEnvelope
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+  }
+
+  export type TransactionUncheckedCreateNestedManyWithoutMetaInput = {
+    create?: XOR<TransactionCreateWithoutMetaInput, TransactionUncheckedCreateWithoutMetaInput> | TransactionCreateWithoutMetaInput[] | TransactionUncheckedCreateWithoutMetaInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutMetaInput | TransactionCreateOrConnectWithoutMetaInput[]
+    createMany?: TransactionCreateManyMetaInputEnvelope
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+  }
+
   export type UserUpdateOneRequiredWithoutGoalsNestedInput = {
     create?: XOR<UserCreateWithoutGoalsInput, UserUncheckedCreateWithoutGoalsInput>
     connectOrCreate?: UserCreateOrConnectWithoutGoalsInput
@@ -14880,10 +15188,52 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGoalsInput, UserUpdateWithoutGoalsInput>, UserUncheckedUpdateWithoutGoalsInput>
   }
 
+  export type TransactionUpdateManyWithoutMetaNestedInput = {
+    create?: XOR<TransactionCreateWithoutMetaInput, TransactionUncheckedCreateWithoutMetaInput> | TransactionCreateWithoutMetaInput[] | TransactionUncheckedCreateWithoutMetaInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutMetaInput | TransactionCreateOrConnectWithoutMetaInput[]
+    upsert?: TransactionUpsertWithWhereUniqueWithoutMetaInput | TransactionUpsertWithWhereUniqueWithoutMetaInput[]
+    createMany?: TransactionCreateManyMetaInputEnvelope
+    set?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    disconnect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    delete?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    update?: TransactionUpdateWithWhereUniqueWithoutMetaInput | TransactionUpdateWithWhereUniqueWithoutMetaInput[]
+    updateMany?: TransactionUpdateManyWithWhereWithoutMetaInput | TransactionUpdateManyWithWhereWithoutMetaInput[]
+    deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
+  }
+
+  export type TransactionUncheckedUpdateManyWithoutMetaNestedInput = {
+    create?: XOR<TransactionCreateWithoutMetaInput, TransactionUncheckedCreateWithoutMetaInput> | TransactionCreateWithoutMetaInput[] | TransactionUncheckedCreateWithoutMetaInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutMetaInput | TransactionCreateOrConnectWithoutMetaInput[]
+    upsert?: TransactionUpsertWithWhereUniqueWithoutMetaInput | TransactionUpsertWithWhereUniqueWithoutMetaInput[]
+    createMany?: TransactionCreateManyMetaInputEnvelope
+    set?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    disconnect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    delete?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    update?: TransactionUpdateWithWhereUniqueWithoutMetaInput | TransactionUpdateWithWhereUniqueWithoutMetaInput[]
+    updateMany?: TransactionUpdateManyWithWhereWithoutMetaInput | TransactionUpdateManyWithWhereWithoutMetaInput[]
+    deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutLimitsInput = {
     create?: XOR<UserCreateWithoutLimitsInput, UserUncheckedCreateWithoutLimitsInput>
     connectOrCreate?: UserCreateOrConnectWithoutLimitsInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type TransactionCreateNestedManyWithoutLimiteInput = {
+    create?: XOR<TransactionCreateWithoutLimiteInput, TransactionUncheckedCreateWithoutLimiteInput> | TransactionCreateWithoutLimiteInput[] | TransactionUncheckedCreateWithoutLimiteInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutLimiteInput | TransactionCreateOrConnectWithoutLimiteInput[]
+    createMany?: TransactionCreateManyLimiteInputEnvelope
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+  }
+
+  export type TransactionUncheckedCreateNestedManyWithoutLimiteInput = {
+    create?: XOR<TransactionCreateWithoutLimiteInput, TransactionUncheckedCreateWithoutLimiteInput> | TransactionCreateWithoutLimiteInput[] | TransactionUncheckedCreateWithoutLimiteInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutLimiteInput | TransactionCreateOrConnectWithoutLimiteInput[]
+    createMany?: TransactionCreateManyLimiteInputEnvelope
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutLimitsNestedInput = {
@@ -14892,6 +15242,34 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutLimitsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutLimitsInput, UserUpdateWithoutLimitsInput>, UserUncheckedUpdateWithoutLimitsInput>
+  }
+
+  export type TransactionUpdateManyWithoutLimiteNestedInput = {
+    create?: XOR<TransactionCreateWithoutLimiteInput, TransactionUncheckedCreateWithoutLimiteInput> | TransactionCreateWithoutLimiteInput[] | TransactionUncheckedCreateWithoutLimiteInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutLimiteInput | TransactionCreateOrConnectWithoutLimiteInput[]
+    upsert?: TransactionUpsertWithWhereUniqueWithoutLimiteInput | TransactionUpsertWithWhereUniqueWithoutLimiteInput[]
+    createMany?: TransactionCreateManyLimiteInputEnvelope
+    set?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    disconnect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    delete?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    update?: TransactionUpdateWithWhereUniqueWithoutLimiteInput | TransactionUpdateWithWhereUniqueWithoutLimiteInput[]
+    updateMany?: TransactionUpdateManyWithWhereWithoutLimiteInput | TransactionUpdateManyWithWhereWithoutLimiteInput[]
+    deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
+  }
+
+  export type TransactionUncheckedUpdateManyWithoutLimiteNestedInput = {
+    create?: XOR<TransactionCreateWithoutLimiteInput, TransactionUncheckedCreateWithoutLimiteInput> | TransactionCreateWithoutLimiteInput[] | TransactionUncheckedCreateWithoutLimiteInput[]
+    connectOrCreate?: TransactionCreateOrConnectWithoutLimiteInput | TransactionCreateOrConnectWithoutLimiteInput[]
+    upsert?: TransactionUpsertWithWhereUniqueWithoutLimiteInput | TransactionUpsertWithWhereUniqueWithoutLimiteInput[]
+    createMany?: TransactionCreateManyLimiteInputEnvelope
+    set?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    disconnect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    delete?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
+    update?: TransactionUpdateWithWhereUniqueWithoutLimiteInput | TransactionUpdateWithWhereUniqueWithoutLimiteInput[]
+    updateMany?: TransactionUpdateManyWithWhereWithoutLimiteInput | TransactionUpdateManyWithWhereWithoutLimiteInput[]
+    deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutCreditCardInput = {
@@ -15231,6 +15609,8 @@ export namespace Prisma {
     type?: $Enums.TransactionType
     createdAt?: Date | string
     tag?: TransactionTagCreateNestedOneWithoutTransactionsInput
+    meta?: GoalCreateNestedOneWithoutTransactionsInput
+    limite?: LimitCreateNestedOneWithoutTransactionsInput
   }
 
   export type TransactionUncheckedCreateWithoutUserInput = {
@@ -15242,6 +15622,8 @@ export namespace Prisma {
     type?: $Enums.TransactionType
     createdAt?: Date | string
     tagId?: string | null
+    metaId?: string | null
+    limiteId?: string | null
   }
 
   export type TransactionCreateOrConnectWithoutUserInput = {
@@ -15263,6 +15645,7 @@ export namespace Prisma {
     color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    transactions?: TransactionCreateNestedManyWithoutMetaInput
   }
 
   export type GoalUncheckedCreateWithoutUserInput = {
@@ -15274,6 +15657,7 @@ export namespace Prisma {
     color?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    transactions?: TransactionUncheckedCreateNestedManyWithoutMetaInput
   }
 
   export type GoalCreateOrConnectWithoutUserInput = {
@@ -15293,6 +15677,7 @@ export namespace Prisma {
     currentSpent?: number
     color?: string
     createdAt?: Date | string
+    transactions?: TransactionCreateNestedManyWithoutLimiteInput
   }
 
   export type LimitUncheckedCreateWithoutUserInput = {
@@ -15302,6 +15687,7 @@ export namespace Prisma {
     currentSpent?: number
     color?: string
     createdAt?: Date | string
+    transactions?: TransactionUncheckedCreateNestedManyWithoutLimiteInput
   }
 
   export type LimitCreateOrConnectWithoutUserInput = {
@@ -15486,6 +15872,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     tagId?: StringNullableFilter<"Transaction"> | string | null
+    metaId?: StringNullableFilter<"Transaction"> | string | null
+    limiteId?: StringNullableFilter<"Transaction"> | string | null
     userId?: StringFilter<"Transaction"> | string
   }
 
@@ -15886,6 +16274,60 @@ export namespace Prisma {
     create: XOR<TransactionTagCreateWithoutTransactionsInput, TransactionTagUncheckedCreateWithoutTransactionsInput>
   }
 
+  export type GoalCreateWithoutTransactionsInput = {
+    id?: string
+    title: string
+    targetAmount: number
+    currentAmount?: number
+    deadline?: Date | string | null
+    color?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutGoalsInput
+  }
+
+  export type GoalUncheckedCreateWithoutTransactionsInput = {
+    id?: string
+    title: string
+    targetAmount: number
+    currentAmount?: number
+    deadline?: Date | string | null
+    color?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type GoalCreateOrConnectWithoutTransactionsInput = {
+    where: GoalWhereUniqueInput
+    create: XOR<GoalCreateWithoutTransactionsInput, GoalUncheckedCreateWithoutTransactionsInput>
+  }
+
+  export type LimitCreateWithoutTransactionsInput = {
+    id?: string
+    title: string
+    limitAmount: number
+    currentSpent?: number
+    color?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutLimitsInput
+  }
+
+  export type LimitUncheckedCreateWithoutTransactionsInput = {
+    id?: string
+    title: string
+    limitAmount: number
+    currentSpent?: number
+    color?: string
+    createdAt?: Date | string
+    userId: string
+  }
+
+  export type LimitCreateOrConnectWithoutTransactionsInput = {
+    where: LimitWhereUniqueInput
+    create: XOR<LimitCreateWithoutTransactionsInput, LimitUncheckedCreateWithoutTransactionsInput>
+  }
+
   export type UserCreateWithoutTransactionsInput = {
     id?: string
     name?: string | null
@@ -15950,6 +16392,72 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type GoalUpsertWithoutTransactionsInput = {
+    update: XOR<GoalUpdateWithoutTransactionsInput, GoalUncheckedUpdateWithoutTransactionsInput>
+    create: XOR<GoalCreateWithoutTransactionsInput, GoalUncheckedCreateWithoutTransactionsInput>
+    where?: GoalWhereInput
+  }
+
+  export type GoalUpdateToOneWithWhereWithoutTransactionsInput = {
+    where?: GoalWhereInput
+    data: XOR<GoalUpdateWithoutTransactionsInput, GoalUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type GoalUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    targetAmount?: FloatFieldUpdateOperationsInput | number
+    currentAmount?: FloatFieldUpdateOperationsInput | number
+    deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutGoalsNestedInput
+  }
+
+  export type GoalUncheckedUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    targetAmount?: FloatFieldUpdateOperationsInput | number
+    currentAmount?: FloatFieldUpdateOperationsInput | number
+    deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    color?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type LimitUpsertWithoutTransactionsInput = {
+    update: XOR<LimitUpdateWithoutTransactionsInput, LimitUncheckedUpdateWithoutTransactionsInput>
+    create: XOR<LimitCreateWithoutTransactionsInput, LimitUncheckedCreateWithoutTransactionsInput>
+    where?: LimitWhereInput
+  }
+
+  export type LimitUpdateToOneWithWhereWithoutTransactionsInput = {
+    where?: LimitWhereInput
+    data: XOR<LimitUpdateWithoutTransactionsInput, LimitUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type LimitUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    limitAmount?: FloatFieldUpdateOperationsInput | number
+    currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutLimitsNestedInput
+  }
+
+  export type LimitUncheckedUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    limitAmount?: FloatFieldUpdateOperationsInput | number
+    currentSpent?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type UserUpsertWithoutTransactionsInput = {
     update: XOR<UserUpdateWithoutTransactionsInput, UserUncheckedUpdateWithoutTransactionsInput>
     create: XOR<UserCreateWithoutTransactionsInput, UserUncheckedCreateWithoutTransactionsInput>
@@ -15999,6 +16507,8 @@ export namespace Prisma {
     color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
+    meta?: GoalCreateNestedOneWithoutTransactionsInput
+    limite?: LimitCreateNestedOneWithoutTransactionsInput
     user: UserCreateNestedOneWithoutTransactionsInput
   }
 
@@ -16010,6 +16520,8 @@ export namespace Prisma {
     color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
+    metaId?: string | null
+    limiteId?: string | null
     userId: string
   }
 
@@ -16150,6 +16662,42 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutGoalsInput, UserUncheckedCreateWithoutGoalsInput>
   }
 
+  export type TransactionCreateWithoutMetaInput = {
+    id?: string
+    title: string
+    description?: string | null
+    value: number
+    color?: string
+    type?: $Enums.TransactionType
+    createdAt?: Date | string
+    tag?: TransactionTagCreateNestedOneWithoutTransactionsInput
+    limite?: LimitCreateNestedOneWithoutTransactionsInput
+    user: UserCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type TransactionUncheckedCreateWithoutMetaInput = {
+    id?: string
+    title: string
+    description?: string | null
+    value: number
+    color?: string
+    type?: $Enums.TransactionType
+    createdAt?: Date | string
+    tagId?: string | null
+    limiteId?: string | null
+    userId: string
+  }
+
+  export type TransactionCreateOrConnectWithoutMetaInput = {
+    where: TransactionWhereUniqueInput
+    create: XOR<TransactionCreateWithoutMetaInput, TransactionUncheckedCreateWithoutMetaInput>
+  }
+
+  export type TransactionCreateManyMetaInputEnvelope = {
+    data: TransactionCreateManyMetaInput | TransactionCreateManyMetaInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutGoalsInput = {
     update: XOR<UserUpdateWithoutGoalsInput, UserUncheckedUpdateWithoutGoalsInput>
     create: XOR<UserCreateWithoutGoalsInput, UserUncheckedCreateWithoutGoalsInput>
@@ -16191,6 +16739,22 @@ export namespace Prisma {
     transactionTags?: TransactionTagUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type TransactionUpsertWithWhereUniqueWithoutMetaInput = {
+    where: TransactionWhereUniqueInput
+    update: XOR<TransactionUpdateWithoutMetaInput, TransactionUncheckedUpdateWithoutMetaInput>
+    create: XOR<TransactionCreateWithoutMetaInput, TransactionUncheckedCreateWithoutMetaInput>
+  }
+
+  export type TransactionUpdateWithWhereUniqueWithoutMetaInput = {
+    where: TransactionWhereUniqueInput
+    data: XOR<TransactionUpdateWithoutMetaInput, TransactionUncheckedUpdateWithoutMetaInput>
+  }
+
+  export type TransactionUpdateManyWithWhereWithoutMetaInput = {
+    where: TransactionScalarWhereInput
+    data: XOR<TransactionUpdateManyMutationInput, TransactionUncheckedUpdateManyWithoutMetaInput>
+  }
+
   export type UserCreateWithoutLimitsInput = {
     id?: string
     name?: string | null
@@ -16224,6 +16788,42 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutLimitsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutLimitsInput, UserUncheckedCreateWithoutLimitsInput>
+  }
+
+  export type TransactionCreateWithoutLimiteInput = {
+    id?: string
+    title: string
+    description?: string | null
+    value: number
+    color?: string
+    type?: $Enums.TransactionType
+    createdAt?: Date | string
+    tag?: TransactionTagCreateNestedOneWithoutTransactionsInput
+    meta?: GoalCreateNestedOneWithoutTransactionsInput
+    user: UserCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type TransactionUncheckedCreateWithoutLimiteInput = {
+    id?: string
+    title: string
+    description?: string | null
+    value: number
+    color?: string
+    type?: $Enums.TransactionType
+    createdAt?: Date | string
+    tagId?: string | null
+    metaId?: string | null
+    userId: string
+  }
+
+  export type TransactionCreateOrConnectWithoutLimiteInput = {
+    where: TransactionWhereUniqueInput
+    create: XOR<TransactionCreateWithoutLimiteInput, TransactionUncheckedCreateWithoutLimiteInput>
+  }
+
+  export type TransactionCreateManyLimiteInputEnvelope = {
+    data: TransactionCreateManyLimiteInput | TransactionCreateManyLimiteInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutLimitsInput = {
@@ -16265,6 +16865,22 @@ export namespace Prisma {
     creditCard?: CreditCardUncheckedUpdateOneWithoutUserNestedInput
     avisos?: AvisoUncheckedUpdateManyWithoutUserNestedInput
     transactionTags?: TransactionTagUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type TransactionUpsertWithWhereUniqueWithoutLimiteInput = {
+    where: TransactionWhereUniqueInput
+    update: XOR<TransactionUpdateWithoutLimiteInput, TransactionUncheckedUpdateWithoutLimiteInput>
+    create: XOR<TransactionCreateWithoutLimiteInput, TransactionUncheckedCreateWithoutLimiteInput>
+  }
+
+  export type TransactionUpdateWithWhereUniqueWithoutLimiteInput = {
+    where: TransactionWhereUniqueInput
+    data: XOR<TransactionUpdateWithoutLimiteInput, TransactionUncheckedUpdateWithoutLimiteInput>
+  }
+
+  export type TransactionUpdateManyWithWhereWithoutLimiteInput = {
+    where: TransactionScalarWhereInput
+    data: XOR<TransactionUpdateManyMutationInput, TransactionUncheckedUpdateManyWithoutLimiteInput>
   }
 
   export type UserCreateWithoutCreditCardInput = {
@@ -16373,6 +16989,8 @@ export namespace Prisma {
     type?: $Enums.TransactionType
     createdAt?: Date | string
     tagId?: string | null
+    metaId?: string | null
+    limiteId?: string | null
   }
 
   export type GoalCreateManyUserInput = {
@@ -16488,6 +17106,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tag?: TransactionTagUpdateOneWithoutTransactionsNestedInput
+    meta?: GoalUpdateOneWithoutTransactionsNestedInput
+    limite?: LimitUpdateOneWithoutTransactionsNestedInput
   }
 
   export type TransactionUncheckedUpdateWithoutUserInput = {
@@ -16499,6 +17119,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TransactionUncheckedUpdateManyWithoutUserInput = {
@@ -16510,6 +17132,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type GoalUpdateWithoutUserInput = {
@@ -16521,6 +17145,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: TransactionUpdateManyWithoutMetaNestedInput
   }
 
   export type GoalUncheckedUpdateWithoutUserInput = {
@@ -16532,6 +17157,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: TransactionUncheckedUpdateManyWithoutMetaNestedInput
   }
 
   export type GoalUncheckedUpdateManyWithoutUserInput = {
@@ -16552,6 +17178,7 @@ export namespace Prisma {
     currentSpent?: FloatFieldUpdateOperationsInput | number
     color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: TransactionUpdateManyWithoutLimiteNestedInput
   }
 
   export type LimitUncheckedUpdateWithoutUserInput = {
@@ -16561,6 +17188,7 @@ export namespace Prisma {
     currentSpent?: FloatFieldUpdateOperationsInput | number
     color?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: TransactionUncheckedUpdateManyWithoutLimiteNestedInput
   }
 
   export type LimitUncheckedUpdateManyWithoutUserInput = {
@@ -16645,6 +17273,8 @@ export namespace Prisma {
     color?: string
     type?: $Enums.TransactionType
     createdAt?: Date | string
+    metaId?: string | null
+    limiteId?: string | null
     userId: string
   }
 
@@ -16656,6 +17286,8 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    meta?: GoalUpdateOneWithoutTransactionsNestedInput
+    limite?: LimitUpdateOneWithoutTransactionsNestedInput
     user?: UserUpdateOneRequiredWithoutTransactionsNestedInput
   }
 
@@ -16667,6 +17299,8 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -16678,6 +17312,112 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TransactionCreateManyMetaInput = {
+    id?: string
+    title: string
+    description?: string | null
+    value: number
+    color?: string
+    type?: $Enums.TransactionType
+    createdAt?: Date | string
+    tagId?: string | null
+    limiteId?: string | null
+    userId: string
+  }
+
+  export type TransactionUpdateWithoutMetaInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tag?: TransactionTagUpdateOneWithoutTransactionsNestedInput
+    limite?: LimitUpdateOneWithoutTransactionsNestedInput
+    user?: UserUpdateOneRequiredWithoutTransactionsNestedInput
+  }
+
+  export type TransactionUncheckedUpdateWithoutMetaInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TransactionUncheckedUpdateManyWithoutMetaInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    limiteId?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TransactionCreateManyLimiteInput = {
+    id?: string
+    title: string
+    description?: string | null
+    value: number
+    color?: string
+    type?: $Enums.TransactionType
+    createdAt?: Date | string
+    tagId?: string | null
+    metaId?: string | null
+    userId: string
+  }
+
+  export type TransactionUpdateWithoutLimiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tag?: TransactionTagUpdateOneWithoutTransactionsNestedInput
+    meta?: GoalUpdateOneWithoutTransactionsNestedInput
+    user?: UserUpdateOneRequiredWithoutTransactionsNestedInput
+  }
+
+  export type TransactionUncheckedUpdateWithoutLimiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TransactionUncheckedUpdateManyWithoutLimiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: FloatFieldUpdateOperationsInput | number
+    color?: StringFieldUpdateOperationsInput | string
+    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tagId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaId?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
   }
 

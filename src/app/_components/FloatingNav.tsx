@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { api } from '~/trpc/react';
 
-export type Tab = 'home' | 'list' | 'goals' | 'limits';
+export type Tab = 'home' | 'list' | 'goals' | 'limits' | 'avisos';
 
 // Paleta oficial de cores do projeto
 const PALETTE = ["#172c3c", "#274862", "#995052", "#d96831", "#e6b33d"];

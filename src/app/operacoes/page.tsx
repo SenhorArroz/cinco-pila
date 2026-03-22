@@ -13,16 +13,30 @@ export default function GestaoFinanceira() {
   // --- API QUERIES ---
   const { data: transactions = [], isLoading } = api.operacoes.getAll.useQuery();
   const { data: tags = [] } = api.transactionTag.getAll.useQuery();
+  
+  // Queries para Metas e Limites (Assumindo que existam no seu router)
+  const { data: metas = [] } = api.metas.getAll.useQuery();
+  const { data: limites = [] } = api.limites.getAll.useQuery();
 
   // --- ESTADOS DE FILTRO ---
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   // --- MUTATIONS (OPERAÇÕES) ---
   const createOp = api.operacoes.create.useMutation({
-    onSuccess: () => { void utils.operacoes.getAll.invalidate(); setIsOpModalOpen(false); },
+    onSuccess: () => { 
+      void utils.operacoes.getAll.invalidate(); 
+      void utils.metas.getAll.invalidate();
+      void utils.limites.getAll.invalidate();
+      setIsOpModalOpen(false); 
+    },
   });
   const updateOp = api.operacoes.update.useMutation({
-    onSuccess: () => { void utils.operacoes.getAll.invalidate(); setIsOpModalOpen(false); },
+    onSuccess: () => { 
+      void utils.operacoes.getAll.invalidate(); 
+      void utils.metas.getAll.invalidate();
+      void utils.limites.getAll.invalidate();
+      setIsOpModalOpen(false); 
+    },
   });
   const deleteOp = api.operacoes.delete.useMutation({
     onSuccess: () => void utils.operacoes.getAll.invalidate(),
@@ -46,7 +60,12 @@ export default function GestaoFinanceira() {
   const [editingOpId, setEditingOpId] = useState<string | null>(null);
   const [opValueInput, setOpValueInput] = useState(""); 
   const [opFormData, setOpFormData] = useState({
-    title: '', description: '', type: 'EXPENSE' as 'INCOME' | 'EXPENSE', tagId: ''
+    title: '', 
+    description: '', 
+    type: 'EXPENSE' as 'INCOME' | 'EXPENSE', 
+    tagId: '',
+    targetType: 'NONE' as 'NONE' | 'META' | 'LIMITE',
+    targetId: ''
   });
 
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
@@ -79,11 +98,18 @@ export default function GestaoFinanceira() {
   const handleOpenOpModal = (item?: any) => {
     if (item) {
       setEditingOpId(item.id);
-      setOpFormData({ title: item.title, description: item.description ?? '', type: item.type, tagId: item.tagId ?? '' });
+      setOpFormData({ 
+        title: item.title, 
+        description: item.description ?? '', 
+        type: item.type, 
+        tagId: item.tagId ?? '',
+        targetType: item.metaId ? 'META' : item.limiteId ? 'LIMITE' : 'NONE',
+        targetId: item.metaId || item.limiteId || ''
+      });
       setOpValueInput(item.value.toString());
     } else {
       setEditingOpId(null);
-      setOpFormData({ title: '', description: '', type: 'EXPENSE', tagId: '' });
+      setOpFormData({ title: '', description: '', type: 'EXPENSE', tagId: '', targetType: 'NONE', targetId: '' });
       setOpValueInput("");
     }
     setIsOpModalOpen(true);
@@ -94,12 +120,14 @@ export default function GestaoFinanceira() {
     const finalValue = parseFloat(opValueInput.replace(',', '.'));
     if (isNaN(finalValue)) return alert("Valor inválido");
     
-    // Tratando tagId e description como opcionais (envia undefined se vazio)
     const payload = { 
-      ...opFormData, 
+      title: opFormData.title,
+      description: opFormData.description || undefined,
+      type: opFormData.type,
       value: finalValue,
       tagId: opFormData.tagId || undefined,
-      description: opFormData.description || undefined
+      metaId: opFormData.targetType === 'META' ? opFormData.targetId : undefined,
+      limiteId: opFormData.targetType === 'LIMITE' ? opFormData.targetId : undefined,
     };
 
     if (editingOpId) updateOp.mutate({ id: editingOpId, ...payload });
@@ -258,7 +286,7 @@ export default function GestaoFinanceira() {
         </div>
       </div>
 
-      {/* --- MODAL OPERAÇÃO (COM CAMPOS OPCIONAIS) --- */}
+      {/* --- MODAL OPERAÇÃO --- */}
       {isOpModalOpen && (
         <div className="modal modal-open backdrop-blur-sm p-4">
           <div className="modal-box bg-white border-4 border-[#172c3c] rounded-[3rem] p-8 max-w-lg w-full">
@@ -295,12 +323,57 @@ export default function GestaoFinanceira() {
                 <select 
                   className="select select-bordered border-2 border-[#172c3c] rounded-2xl font-black bg-[#f0f2f5] w-full" 
                   value={opFormData.type} 
-                  onChange={e => setOpFormData({ ...opFormData, type: e.target.value as any })}
+                  onChange={e => setOpFormData({ ...opFormData, type: e.target.value as any, targetType: 'NONE' })}
                 >
                   <option value="EXPENSE">SAÍDA (-)</option>
                   <option value="INCOME">ENTRADA (+)</option>
                 </select>
               </div>
+
+              {/* --- NOVA SEÇÃO: VÍNCULO COM META OU LIMITE --- */}
+              {opFormData.type === 'EXPENSE' && (
+                <div className="col-span-6 bg-[#274862]/5 p-4 rounded-3xl border-2 border-[#172c3c]/10">
+                  <label className="label uppercase font-black text-[9px] opacity-50 mb-2">Descontar de onde?</label>
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    <button 
+                      type="button"
+                      onClick={() => setOpFormData({...opFormData, targetType: 'NONE', targetId: ''})}
+                      className={`py-2 rounded-xl text-[9px] font-black uppercase border-2 transition-all ${opFormData.targetType === 'NONE' ? 'bg-[#172c3c] text-white border-[#172c3c]' : 'bg-white border-black/5 opacity-50'}`}
+                    >
+                      Nenhum
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setOpFormData({...opFormData, targetType: 'META', targetId: ''})}
+                      className={`py-2 rounded-xl text-[9px] font-black uppercase border-2 transition-all ${opFormData.targetType === 'META' ? 'bg-[#e6b33d] text-[#172c3c] border-[#e6b33d]' : 'bg-white border-black/5 opacity-50'}`}
+                    >
+                      Meta
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setOpFormData({...opFormData, targetType: 'LIMITE', targetId: ''})}
+                      className={`py-2 rounded-xl text-[9px] font-black uppercase border-2 transition-all ${opFormData.targetType === 'LIMITE' ? 'bg-[#995052] text-white border-[#995052]' : 'bg-white border-black/5 opacity-50'}`}
+                    >
+                      Limite
+                    </button>
+                  </div>
+
+                  {opFormData.targetType !== 'NONE' && (
+                    <select 
+                      required
+                      className="select select-sm select-bordered border-2 border-[#172c3c] rounded-xl font-black bg-white w-full"
+                      value={opFormData.targetId}
+                      onChange={e => setOpFormData({...opFormData, targetId: e.target.value})}
+                    >
+                      <option value="">Escolher {opFormData.targetType === 'META' ? 'Meta' : 'Limite'}</option>
+                      {opFormData.targetType === 'META' 
+                        ? metas.map(m => <option key={m.id} value={m.id}>{m.title.toUpperCase()}</option>)
+                        : limites.map(l => <option key={l.id} value={l.id}>{l.title.toUpperCase()}</option>)
+                      }
+                    </select>
+                  )}
+                </div>
+              )}
 
               <div className="form-control col-span-6">
                 <label className="label uppercase font-black text-[10px] opacity-40 italic">Etiqueta (Tag) - Opcional</label>
@@ -349,7 +422,7 @@ export default function GestaoFinanceira() {
                   <input type="text" required className="input input-bordered border-2 border-[#172c3c] rounded-xl font-bold bg-white" value={tagFormData.name} onChange={e => setTagFormData({ ...tagFormData, name: e.target.value })} />
                 </div>
                 <div className="form-control">
-                  <label className="label uppercase font-black text-[10px] opacity-40">Cor (Paleta ou Seletor)</label>
+                  <label className="label uppercase font-black text-[10px] opacity-40">Cor</label>
                   <div className="flex items-center gap-3 bg-white p-2 rounded-xl border-2 border-[#172c3c]/10">
                     <div className="flex gap-1 flex-wrap">
                       {PALETTE.map(color => (
@@ -364,18 +437,17 @@ export default function GestaoFinanceira() {
               <button type="submit" className="btn bg-[#172c3c] text-white w-full mt-8 rounded-xl font-black uppercase">
                 {editingTagId ? 'Atualizar Tag' : 'Criar Tag'}
               </button>
-              {editingTagId && <button type="button" onClick={resetTagForm} className="btn btn-ghost btn-xs w-full mt-2 font-black opacity-30">CANCELAR EDIÇÃO</button>}
             </form>
-            <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-2 mt-4 max-h-60 overflow-y-auto custom-scrollbar">
               {tags?.map(tag => (
-                <div key={tag.id} className="flex justify-between items-center bg-white border-2 border-[#172c3c]/5 p-4 rounded-2xl hover:border-[#172c3c]/30 transition-all group">
+                <div key={tag.id} className="flex justify-between items-center bg-white border-2 border-[#172c3c]/5 p-4 rounded-2xl group">
                   <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full shadow-inner" style={{ backgroundColor: tag.color }} />
-                    <span className="font-black uppercase text-sm tracking-tight">{tag.name}</span>
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tag.color }} />
+                    <span className="font-black uppercase text-sm">{tag.name}</span>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => { setEditingTagId(tag.id); setTagFormData({ name: tag.name, color: tag.color }); }} className="btn btn-ghost btn-xs font-black text-[#172c3c]">EDIT</button>
-                    <button onClick={() => { if(confirm("Apagar tag permanentemente?")) deleteTag.mutate({ id: tag.id }) }} className="btn btn-ghost btn-xs font-black text-[#995052]">DEL</button>
+                    <button onClick={() => { setEditingTagId(tag.id); setTagFormData({ name: tag.name, color: tag.color }); }} className="btn btn-ghost btn-xs font-black">EDIT</button>
+                    <button onClick={() => deleteTag.mutate({ id: tag.id })} className="btn btn-ghost btn-xs font-black text-[#995052]">DEL</button>
                   </div>
                 </div>
               ))}

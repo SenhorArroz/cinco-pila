@@ -175,6 +175,8 @@ exports.Prisma.TransactionScalarFieldEnum = {
   type: 'type',
   createdAt: 'createdAt',
   tagId: 'tagId',
+  metaId: 'metaId',
+  limiteId: 'limiteId',
   userId: 'userId'
 };
 
