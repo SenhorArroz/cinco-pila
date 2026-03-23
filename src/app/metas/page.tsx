@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import FloatingNav, { type Tab } from '../_components/FloatingNav';
 import { api } from '~/trpc/react';
 
-// --- TYPES (Sincronizados com seu Router) ---
 interface GoalFormData {
   id?: string;
   title: string;
   currentAmount: number;
   color: string;
   targetAmount: number;
-  deadline?: string; // Formato YYYY-MM-DD para o input
+  deadline?: string;
 }
 const PALETTE = ["#172c3c", "#274862", "#995052", "#d96831", "#e6b33d"];
 
@@ -18,6 +17,8 @@ const PALETTE = ["#172c3c", "#274862", "#995052", "#d96831", "#e6b33d"];
 export default function MetasCincoPila() {
   const [activeTab, setActiveTab] = useState<Tab>('goals');
   const utils = api.useUtils();
+  const [currentAmountInput, setCurrentAmountInput] = useState(""); 
+  const [targetAmountInput, setTargetAmountInput] = useState("");
 
   // --- QUERIES & MUTATIONS ---
   const { data: goals = [], isLoading } = api.metas.getAll.useQuery();
@@ -58,19 +59,25 @@ export default function MetasCincoPila() {
         targetAmount: goal.targetAmount,
         deadline: goal.deadline ? new Date(goal.deadline).toISOString().split('T')[0] : '',
       });
+      setCurrentAmountInput(goal.currentAmount.toString());
+      setTargetAmountInput(goal.targetAmount.toString());
     } else {
       setEditingId(null);
       setFormData({ title: '', currentAmount: 0, targetAmount: 0, deadline: '', color: '#ffffffff' });
+      setCurrentAmountInput("");
+      setTargetAmountInput("");
     }
     setIsModalOpen(true);
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalCurrentAmount = parseFloat(currentAmountInput.replace(',', '.'));
+    const finalTargetAmount = parseFloat(targetAmountInput.replace(',', '.'));
     const payload = {
       title: formData.title,
-      currentAmount: formData.currentAmount,
-      targetAmount: formData.targetAmount,
+      currentAmount: finalCurrentAmount,
+      targetAmount: finalTargetAmount,
       color: formData.color,
       deadline: formData.deadline ? new Date(formData.deadline) : undefined,
     };
@@ -225,11 +232,12 @@ export default function MetasCincoPila() {
   <div className="form-control col-span-3">
     <label className="label uppercase font-black text-[10px] opacity-40">Guardado (R$)</label>
     <input 
-      type="number" 
-      step="0.01" 
+      type="text" 
+      inputMode="decimal" 
+      required 
       className="input input-bordered bg-white text-black border-2 border-[#172c3c] rounded-2xl font-bold w-full" 
-      value={formData.currentAmount}
-      onChange={e => setFormData({...formData, currentAmount: Number(e.target.value)})}
+      value={currentAmountInput}
+      onChange={e => setCurrentAmountInput(e.target.value.replace(/[^0-9.,]/g, ""))}
     />
   </div>
 
@@ -237,12 +245,12 @@ export default function MetasCincoPila() {
   <div className="form-control col-span-3">
     <label className="label uppercase font-black text-[10px] opacity-40">Alvo (R$)</label>
     <input 
-      type="number" 
-      step="0.01" 
+      type="text" 
+      inputMode="decimal" 
       required 
       className="input input-bordered bg-white text-[#d96831] border-2 border-[#172c3c] rounded-2xl font-black w-full" 
-      value={formData.targetAmount}
-      onChange={e => setFormData({...formData, targetAmount: Number(e.target.value)})}
+      value={targetAmountInput}
+      onChange={e => setTargetAmountInput(e.target.value.replace(/[^0-9.,]/g, ""))}
     />
   </div>  
 

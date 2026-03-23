@@ -7,6 +7,9 @@ import LimiteComponente from '../_components/LimiteComponente';
 export default function LimitesCincoPila() {
   const [activeTab, setActiveTab] = useState<Tab>('limits');
   const utils = api.useUtils();
+  const [opValueInput, setOpValueInput] = useState(""); 
+  const [limitValueInput, setLimitValueInput] = useState("");
+  
 
   // --- QUERIES & MUTATIONS ---
   const { data: limits = [], isLoading } = api.limites.getAll.useQuery();
@@ -58,19 +61,31 @@ export default function LimitesCincoPila() {
         limitAmount: limit.limitAmount,
         color: limit.color
       });
+      setOpValueInput(limit.currentSpent.toString());
+      setLimitValueInput(limit.limitAmount.toString());
     } else {
       setEditingId(null);
       setFormData({ title: '', currentSpent: 0, limitAmount: 0, color: '#172c3c' });
+      setOpValueInput("");
+      setLimitValueInput("");
     }
     setIsModalOpen(true);
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalValue = parseFloat(opValueInput.replace(',', '.'));
+    const finalLimitValue = parseFloat(limitValueInput.replace(',', '.'));
+    const payLoad  = {
+      title: formData.title,
+      currentSpent: finalValue,
+      limitAmount: finalLimitValue,
+      color: formData.color
+    };
     if (editingId) {
-      updateLimit.mutate({ id: editingId, ...formData });
+      updateLimit.mutate({ id: editingId, ...payLoad });
     } else {
-      createLimit.mutate(formData);
+      createLimit.mutate(payLoad);
     }
   };
 
@@ -140,17 +155,23 @@ export default function LimitesCincoPila() {
                   <div className="form-control">
                     <label className="label uppercase font-black text-[10px]">Valor Já Gasto</label>
                     <input 
-                      type="number" step="0.01" className="input input-bordered border-2 border-[#172c3c] rounded-xl font-bold bg-white text-[#172c3c]" 
-                      value={formData.currentSpent}
-                      onChange={e => setFormData({...formData, currentSpent: Number(e.target.value)})}
+                      type="text" 
+                      inputMode="decimal" 
+                      required 
+                      className="input input-bordered border-2 border-[#172c3c] rounded-xl font-bold bg-white text-[#172c3c]" 
+                      value={opValueInput}
+                      onChange={e => setOpValueInput(e.target.value.replace(/[^0-9.,]/g, ""))} 
                     />
                   </div>
                   <div className="form-control">
                     <label className="label uppercase font-black text-[10px]">Limite Máximo</label>
                     <input 
-                      type="number" step="0.01" required className="input input-bordered border-2 border-[#172c3c] rounded-xl font-black text-[#d96831] bg-white" 
-                      value={formData.limitAmount}
-                      onChange={e => setFormData({...formData, limitAmount: Number(e.target.value)})}
+                      type="text" 
+                      inputMode="decimal" 
+                      required 
+                      className="input input-bordered border-2 border-[#172c3c] rounded-xl font-black text-[#d96831] bg-white" 
+                      value={limitValueInput}
+                      onChange={e => setLimitValueInput(e.target.value.replace(/[^0-9.,]/g, ""))}
                     />
                   </div>
                 </div>
