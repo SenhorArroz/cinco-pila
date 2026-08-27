@@ -36,7 +36,7 @@ export default function AboutPage() {
               </Parallax>
               <Parallax translateY={[20, -20]} className="mt-12">
                 <p className="text-2xl md:text-4xl font-bold italic leading-tight text-white/50 max-w-xl">
-                  <span className="text-white">O projeto nasceu de uma discussão que tive com a minha namorada sobre eu estar gastando muito.</span>
+                  <span className="text-white">O projeto nasceu de uma discussão do meu passado obscuro sobre eu estar gastando muito.</span>
                 </p>
               </Parallax>
             </div>
